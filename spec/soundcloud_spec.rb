@@ -59,12 +59,29 @@ describe Soundcloud do
   describe "#exchange_token" do
     it "should raise an argument error if client_secret no present" do
       lambda do
-        Soundcloud.new(:client_id => 'x').exchange_token(:refresh_token => 'as')
+        Soundcloud.new(:client_id => 'x').exchange_token(:refresh_token => 'as')  
       end.should raise_error ArgumentError
     end
 
+    it "should raise a response error when exchanging token results in 401" do
+      lambda do
+        FakeWeb.register_uri(:post, 
+          "https://api.soundcloud.com/oauth2/token?grant_type=refresh_token&refresh_token=as&client_id=x&client_secret=bang", 
+          :status => [401, "Unauthorized"],
+          :body => '{error: "invalid_client"}', 
+          :content_type => "application/json"
+        )
+        Soundcloud.new(:client_id => 'x', :client_secret => 'bang').exchange_token(:refresh_token => 'as')
+      end.should raise_error Soundcloud::ResponseError
+    end
+
+
     context "when initialized with client_id, client_secret" do
       let(:fake_token_response) { {'access_token' => 'ac', 'expires_in' => 3600, 'scope' => 3600, 'refresh_token' => 'ref'} }
+      before do
+        fake_token_response.stub!(:success?).and_return(true)
+      end
+      
       subject { Soundcloud.new(:client_id => 'client', :client_secret => 'secret') }
 
       it "should store the passed options" do

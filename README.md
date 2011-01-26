@@ -35,7 +35,7 @@ It is providing simple methods to handle authorization and to execute HTTP calls
     
     # print logged in username
     puts client.get('/me').username
-    
+
 #### Do the OAuth2 authorization code flow
     sc = Soundcloud.new({
       :client_id      => 'YOUR_CLIENT_ID',
@@ -66,7 +66,7 @@ It is providing simple methods to handle authorization and to execute HTTP calls
 
 #### Resolve a track url and print its id
      # register the client
-     client = Soundcloud.new(:client_id      => 'YOUR_CLIENT_ID')
+     client = Soundcloud.new(:client_id => 'YOUR_CLIENT_ID')
      
      # call the resolve endpoint with a track url
      track = client.get('/resolve', :url => "http://soundcloud.com/forss/flickermood")
@@ -106,5 +106,5 @@ The response is either a Hashie::Mash or an array of Hashie::Mashs. The mashs ex
 These are accessor to the stored options.
 
 #### Error Handling
-In case of an unsuccessful request a Soundcloud::ResponseError will be raise.
+In case a request was not successful a Soundcloud::ResponseError will be raise.
 The original HTTParty response is available through Soundcloud::ResponseError#response.
