@@ -1,5 +1,5 @@
 gem 'httmultiparty'
-gem 'mash'
+gem 'hashie'
 require 'httmultiparty'
 require 'hashie'
 require 'uri'
