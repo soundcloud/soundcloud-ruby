@@ -29,13 +29,12 @@ class Soundcloud
     raise ArgumentError, "At least a client_id or an access_token must be present" if client_id.nil? && access_token.nil?
   end
 
-  # the exposed http methods
-  def get   (path, options={}); handle_response { self.class.get    *construct_query_arguments(path, options) } end
-  def post  (path, options={}); handle_response { self.class.post   *construct_query_arguments(path, options) } end
-  def put   (path, options={}); handle_response { self.class.put    *construct_query_arguments(path, options) } end
-  def delete(path, options={}); handle_response { self.class.delete *construct_query_arguments(path, options) } end
-  def head  (path, options={}); handle_response { self.class.head   *construct_query_arguments(path, options) } end
-  
+  def get   (path, query={}, options={}); handle_response { self.class.get    *construct_query_arguments(path, options.merge(:query => query)) } end
+  def post  (path, query={}, options={}); handle_response { self.class.post   *construct_query_arguments(path, options.merge(:query => query)) } end
+  def put   (path, query={}, options={}); handle_response { self.class.put    *construct_query_arguments(path, options.merge(:query => query)) } end
+  def delete(path, query={}, options={}); handle_response { self.class.delete *construct_query_arguments(path, options.merge(:query => query)) } end
+  def head  (path, query={}, options={}); handle_response { self.class.head   *construct_query_arguments(path, options.merge(:query => query)) } end
+
   # accessors for options
   def client_id;      @options[:client_id];     end
   def client_secret;  @options[:client_secret]; end
@@ -98,8 +97,9 @@ private
     @options ||= DEFAULT_OPTIONS.dup
     @options.merge! options
   end
-  
-  def construct_query_arguments(path, options={})
+
+  def construct_query_arguments(path_or_uri, options={})
+    path = URI.parse(path_or_uri).path
     scheme = use_ssl? ? 'https' : 'http'
     options = options.dup
     options[:query] ||= {}

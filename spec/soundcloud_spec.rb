@@ -18,10 +18,15 @@ describe Soundcloud do
 
     METHODS.each do |method|
       describe "##{method}" do
+        it "should accept urls as path and rewrite them" do
+          Soundcloud.should_receive(method).with('http://api.soundcloud.com/tracks/123', {:query => {:consumer_key => 'client'}})
+          subject.send(method, 'http://api.soundcloud.com/tracks/123')
+        end
+        
         it "should pass the client_id as consumer_key (LEGACY) to .#{method}" do
           # TODO fix when api is ready for client_id
           Soundcloud.should_receive(method).with('http://api.soundcloud.com/tracks', {:query => {:consumer_key => 'client', :limit => 2}})
-          subject.send(method, '/tracks', :query => {:limit => 2})
+          subject.send(method, '/tracks', :limit => 2)
         end
         
         it "should wrap the response object in a Response" do
