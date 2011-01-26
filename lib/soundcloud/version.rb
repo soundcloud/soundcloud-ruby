@@ -1,3 +1,3 @@
 class Soundcloud
-  VERSION = '0.1.2b'
+  VERSION = '0.1.3b'
 end
