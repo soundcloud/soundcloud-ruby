@@ -1,13 +1,14 @@
 gem 'httmultiparty'
 gem 'mash'
 require 'httmultiparty'
-require 'mash'
+require 'hashie'
 require 'uri'
 
 class Soundcloud
   class ResponseError < HTTParty::ResponseError; end
-  
   include HTTMultiParty
+  headers 'Accept' => 'application/json'
+  
   # TODO fix when api is ready for client_id
   CLIENT_ID_PARAM_NAME  = :consumer_key
   API_SUBHOST           = 'api'
@@ -16,6 +17,7 @@ class Soundcloud
   DEFAULT_OPTIONS       = {
     :site => 'soundcloud.com'
   }
+
 
   def initialize(options={})
     store_options(options)
@@ -76,9 +78,10 @@ private
     if response && !response.success?
       if response.code == 401 && response["error"] == "invalid_grant" && refreshing_enabled
         exchange_token
+        # TODO it should return the original
         handle_response(false, &block)
       else
-        raise ResponseError.new(response)
+        raise ResponseError.new(response), "HTTP Status #{response.code}"
       end
     elsif response.is_a? Hash
       HashResponseWrapper.new(response)
@@ -98,14 +101,17 @@ private
   
   def construct_query_arguments(path, options={})
     scheme = use_ssl? ? 'https' : 'http'
-    auth_options = if access_token
-      {:query => {:oauth_token => access_token}}
+    options = options.dup
+    options[:query] ||= {}
+
+    if access_token
+      options[:query][:oauth_token] = access_token
     else
-      {:query => {CLIENT_ID_PARAM_NAME => client_id}}
+      options[:query][CLIENT_ID_PARAM_NAME] = client_id
     end
     [
       "#{scheme}://#{api_host}#{path}",
-      options.merge(auth_options)
+      options
     ]
   end
 end

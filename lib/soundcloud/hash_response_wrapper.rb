@@ -1,4 +1,4 @@
-class Soundcloud::HashResponseWrapper < Mash
+class Soundcloud::HashResponseWrapper < Hashie::Mash
   attr_reader :response
   def initialize(response)
     super(response)
