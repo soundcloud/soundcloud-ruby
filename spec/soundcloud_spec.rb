@@ -22,6 +22,11 @@ describe Soundcloud do
           Soundcloud.should_receive(method).with('http://api.soundcloud.com/tracks/123', {:query => {:consumer_key => 'client'}})
           subject.send(method, 'http://api.soundcloud.com/tracks/123')
         end
+
+        it "should preserve query string in path" do
+          FakeWeb.register_uri(method, "http://api.soundcloud.com/tracks?consumer_key=client&created_with_app_id=124", :body => "[{'title': 'bla'}]", :content_type => "application/json")
+          subject.send(method, '/tracks?created_with_app_id=124').should be_an_instance_of Soundcloud::ArrayResponseWrapper
+        end
         
         it "should pass the client_id as consumer_key (LEGACY) to .#{method}" do
           # TODO fix when api is ready for client_id

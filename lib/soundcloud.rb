@@ -101,7 +101,9 @@ private
   end
 
   def construct_query_arguments(path_or_uri, options={})
-    path = URI.parse(path_or_uri).path
+    uri = URI.parse(path_or_uri)
+    path = uri.path
+    
     scheme = use_ssl? ? 'https' : 'http'
     options = options.dup
     options[:query] ||= {}
@@ -112,7 +114,7 @@ private
       options[:query][CLIENT_ID_PARAM_NAME] = client_id
     end
     [
-      "#{scheme}://#{api_host}#{path}",
+      "#{scheme}://#{api_host}#{path}#{uri.query ? "?#{uri.query}" : ""}",
       options
     ]
   end
