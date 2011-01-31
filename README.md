@@ -16,7 +16,7 @@ It is providing simple methods to handle authorization and to execute HTTP calls
 ## Examples
 #### print links of the 10 hottest tracks
     # register a client with YOUR_CLIENT_ID as client_id_
-    client = Soundcloud.new(:client_id => 'YOUR_CLIENT_ID')
+    client = Soundcloud.new(:client_id => YOUR_CLIENT_ID)
     # get 10 hottest tracks
     tracks = client.get('/tracks', :limit => 10, :order => 'hotness')
     # print each link
@@ -27,8 +27,8 @@ It is providing simple methods to handle authorization and to execute HTTP calls
 #### Do the OAuth2 user credentials flow and print the username of the authenticated user
     # register a new client, which will exchange the username, password for an access_token
     client = Soundcloud.new({
-      :client_id      => 'YOUR_CLIENT_ID',
-      :client_secret  => 'YOUR_CLIENT_SECRET',
+      :client_id      => YOUR_CLIENT_ID,
+      :client_secret  => YOUR_CLIENT_SECRET,
       :username       => 'some@email.com',
       :password       => 'userpass'
     })
@@ -38,8 +38,8 @@ It is providing simple methods to handle authorization and to execute HTTP calls
 
 #### Do the OAuth2 authorization code flow
     sc = Soundcloud.new({
-      :client_id      => 'YOUR_CLIENT_ID',
-      :client_secret  => 'YOUR_CLIENT_SECRET',
+      :client_id      => YOUR_CLIENT_ID,
+      :client_secret  => YOUR_CLIENT_SECRET,
     })
     
     sc.authorize_url(:redirect_uri => uri)
@@ -49,24 +49,23 @@ It is providing simple methods to handle authorization and to execute HTTP calls
 #### Do the OAuth2 refresh token flow, upload a track and print its link
     # register a new client which will exchange an existing refresh_token for an access_token
     client = Soundcloud.new({
-      :client_id      => 'YOUR_CLIENT_ID',
-      :client_secret  => 'YOUR_CLIENT_SECRET',
-      :refresh_token  => 'SOME_REFRESH_TOKEN'
+      :client_id      => YOUR_CLIENT_ID,
+      :client_secret  => YOUR_CLIENT_SECRET,
+      :refresh_token  => SOME_REFRESH_TOKEN
     })
     
     # upload a new track with track.mp3 as audio and image.jpg as artwork
-    track = client.post('/tracks', {
+    track = client.post('/tracks', :track => {
       :title        => 'a new track',
-      :asset_data   => File.new('track.mp3'),
-      :artwork_data => File.new('image.jpg')
-    })
+      :asset_data   => File.new('audio.mp3')
+    }, :format => 'json')
     
     # print new tracks link
     puts track.permalink_url
 
 #### Resolve a track url and print its id
      # register the client
-     client = Soundcloud.new(:client_id => 'YOUR_CLIENT_ID')
+     client = Soundcloud.new(:client_id => YOUR_CLIENT_ID)
      
      # call the resolve endpoint with a track url
      track = client.get('/resolve', :url => "http://soundcloud.com/forss/flickermood")
@@ -76,10 +75,10 @@ It is providing simple methods to handle authorization and to execute HTTP calls
 
 #### Register a client for http://sandbox-soundcloud.com with an existing access_token and start following a user
     # register a client for http://sandbox-soundcloud.com with existing access_token
-    client = Soundcloud.new(:site => 'http://sandbox-soundcloud.com', :access_token => 'SOME_ACCESS_TOKEN')
+    client = Soundcloud.new(:site => 'sandbox-soundcloud.com', :access_token => SOME_ACCESS_TOKEN)
     
     # create a new following
-    user_id_to_follow = 123
+    user_id_to_follow = 251670
     client.put("/me/followings/#{user_id_to_follow}")
 
 ## Details
