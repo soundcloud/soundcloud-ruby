@@ -66,7 +66,7 @@ class Soundcloud
       {:grant_type => 'authorization_code', :redirect_uri  => @options[:redirect_uri], :code => @options[:code]}
     end
     params.merge!(client_params)
-    response = handle_response {
+    response = handle_response(false) {
       self.class.post("https://#{api_host}#{TOKEN_PATH}", :query => params)
     }
     @options.merge!(:access_token => response.access_token, :refresh_token => response.refresh_token)
