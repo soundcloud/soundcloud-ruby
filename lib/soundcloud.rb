@@ -40,6 +40,8 @@ class Soundcloud
   def client_secret;  @options[:client_secret]; end
   def access_token;   @options[:access_token];  end
   def refresh_token;  @options[:refresh_token]; end
+  def redirect_uri;   @options[:redirect_uri]; end
+
   def use_ssl?; 
     !! @options[:use_ssl?] || access_token
   end
