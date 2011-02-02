@@ -1,6 +1,6 @@
 # Soundcloud API Wrapper
-## Description
-This is a thin wrapper around the Soundcloud API based of httparty.
+## Declientription
+The Soundcloud gem is a thin wrapper for the Soundcloud API based of the httparty gem.
 It is providing simple methods to handle authorization and to execute HTTP calls.
 
 ## Requirements
@@ -14,7 +14,7 @@ It is providing simple methods to handle authorization and to execute HTTP calls
     gem install soundcloud
 
 ## Examples
-#### print links of the 10 hottest tracks
+#### Print links of the 10 hottest tracks
     # register a client with YOUR_CLIENT_ID as client_id_
     client = Soundcloud.new(:client_id => YOUR_CLIENT_ID)
     # get 10 hottest tracks
@@ -24,8 +24,10 @@ It is providing simple methods to handle authorization and to execute HTTP calls
       puts track.permalink_url
     end
   
-#### Do the OAuth2 user credentials flow and print the username of the authenticated user
+#### OAuth2 user credentials flow and print the username of the authenticated user
     # register a new client, which will exchange the username, password for an access_token
+    # NOTE: the SoundCloud API Docs advices to not use the user credentials flow in a web app.
+    # In any case never store the password of a user.
     client = Soundcloud.new({
       :client_id      => YOUR_CLIENT_ID,
       :client_secret  => YOUR_CLIENT_SECRET,
@@ -36,17 +38,17 @@ It is providing simple methods to handle authorization and to execute HTTP calls
     # print logged in username
     puts client.get('/me').username
 
-#### Do the OAuth2 authorization code flow
-    sc = Soundcloud.new({
+#### OAuth2 authorization code flow
+    client = Soundcloud.new({
       :client_id      => YOUR_CLIENT_ID,
       :client_secret  => YOUR_CLIENT_SECRET,
     })
     
-    sc.authorize_url(:redirect_uri => uri)
+    client.authorize_url(:redirect_uri => REDIRECT_URI)
     # => "https://soundcloud.com/connect?client_id=YOUR_CLIENT_ID&response_type=code&redirect_uri=http://host/redirect"
-    sc.exchange_code(:redirect_uri => uri, :code => 'CODE')
+    client.exchange_code(:redirect_uri => uri, :code => 'CODE')
 
-#### Do the OAuth2 refresh token flow, upload a track and print its link
+#### OAuth2 refresh token flow, upload a track and print its link
     # register a new client which will exchange an existing refresh_token for an access_token
     client = Soundcloud.new({
       :client_id      => YOUR_CLIENT_ID,
@@ -58,7 +60,7 @@ It is providing simple methods to handle authorization and to execute HTTP calls
     track = client.post('/tracks', :track => {
       :title        => 'a new track',
       :asset_data   => File.new('audio.mp3')
-    }, :format => 'json')
+    })
     
     # print new tracks link
     puts track.permalink_url
@@ -78,31 +80,31 @@ It is providing simple methods to handle authorization and to execute HTTP calls
     client = Soundcloud.new(:site => 'sandbox-soundcloud.com', :access_token => SOME_ACCESS_TOKEN)
     
     # create a new following
-    user_id_to_follow = 251670
+    user_id_to_follow = 123
     client.put("/me/followings/#{user_id_to_follow}")
 
-## Details
+## Interface
 #### Soundcloud.new(options={})
-Will store the passed options and call exchange_token in case options are passed that allow an exchange of tokens.
+Stores the passed options and call exchange_token in case options are passed that allow an exchange of tokens.
 
 #### Soundcloud#exchange_token(options={})
-Will store the passed options and try to exchange tokens if no access_token is present and:
+Stores the passed options and try to exchange tokens if no access_token is present and:
 - refresh_token, client_id and client_secret is present.
 - client_id, client_secret, username, password is present
 - client_id, client_secret, redirect_uri, code is present
 
 #### Soundcloud#authorize_url(options={})
-Will store the passed options and return an authorize url.
+Stores the passed options and return an authorize url.
 The client_id and redirect_uri options need to present to generate the authorize url.
 
 #### Soundcloud#get, Soundcloud#post, Soundcloud#put, Soundcloud#delete, Soundcloud#head
-All available HTTP methods are exposed through these methods. They all share the signature (path_or_uri, query={}, options={}).
+These methods expose all available HTTP methods. They all share the signature (path_or_uri, query={}, options={}).
 The query hash will be merged with the options hash and passed to httparty. Depending on if the client is authorized it will either add the client_id or the access_token as a query parameter.
-In case an access_token is expired and a refresh_token is present it will try to refresh the access_token and retry the call.
+In case an access_token is expired and a refresh_token, client_id and client_secret is present it will try to refresh the access_token and retry the call.
 The response is either a Hashie::Mash or an array of Hashie::Mashs. The mashs expose all resource attributes as methods and the original response through #response.
 
 #### Soundcloud#client_id, client_secret, access_token, refresh_token, use_ssl?
-These are accessor to the stored options.
+These methods are accessors for the stored options.
 
 #### Error Handling
 In case a request was not successful a Soundcloud::ResponseError will be raise.
