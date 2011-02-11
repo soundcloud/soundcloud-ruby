@@ -106,6 +106,15 @@ The response is either a Hashie::Mash or an array of Hashie::Mashs. The mashs ex
 #### Soundcloud#client_id, client_secret, access_token, refresh_token, use_ssl?
 These methods are accessors for the stored options.
 
+### Soundcloud#on_exchange_token
+A Proc passed to on_exchange_token will be called each time a token was successfully exchanged or refreshed
+
+### Soundcloud#expires_at
+Returns a date based on the expires_in attribute returned from a token exchange.
+
+### Soundcloud#expired?
+Will return true or false depending on if expires_at is in the past.
+
 #### Error Handling
 In case a request was not successful a Soundcloud::ResponseError will be raise.
 The original HTTParty response is available through Soundcloud::ResponseError#response.
