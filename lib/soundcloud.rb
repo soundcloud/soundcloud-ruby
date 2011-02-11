@@ -15,7 +15,8 @@ class Soundcloud
   AUTHORIZE_PATH        = '/connect'
   TOKEN_PATH            = '/oauth2/token'
   DEFAULT_OPTIONS       = {
-    :site => 'soundcloud.com'
+    :site              => 'soundcloud.com',
+    :on_exchange_token => lambda {}
   }
 
 
@@ -40,7 +41,12 @@ class Soundcloud
   def client_secret;  @options[:client_secret]; end
   def access_token;   @options[:access_token];  end
   def refresh_token;  @options[:refresh_token]; end
-  def redirect_uri;   @options[:redirect_uri]; end
+  def redirect_uri;   @options[:redirect_uri];  end
+  def expires_at;     @options[:expires_at];    end
+
+  def expired?
+    (expires_at.nil? || expires_at < Time.now)
+  end
 
   def use_ssl?; 
     !! @options[:use_ssl?] || access_token
@@ -72,9 +78,15 @@ class Soundcloud
       self.class.post("https://#{api_host}#{TOKEN_PATH}", :query => params)
     }
     @options.merge!(:access_token => response.access_token, :refresh_token => response.refresh_token)
+    @options[:expires_at] = Time.now + response.expires_in
+    @options[:on_exchange_token].call
     response
   end
-  
+
+  def on_exchange_token(&block)
+    store_options(:on_exchange_token => block)
+  end
+
 private
   def handle_response(refreshing_enabled=true, &block)
     response = block.call
@@ -101,6 +113,7 @@ private
     @options ||= DEFAULT_OPTIONS.dup
     @options.merge! options
   end
+  
 
   def construct_query_arguments(path_or_uri, options={})
     uri = URI.parse(path_or_uri)
