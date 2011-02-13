@@ -46,7 +46,7 @@ It is providing simple methods to handle authorization and to execute HTTP calls
     
     client.authorize_url(:redirect_uri => REDIRECT_URI)
     # => "https://soundcloud.com/connect?client_id=YOUR_CLIENT_ID&response_type=code&redirect_uri=http://host/redirect"
-    client.exchange_code(:redirect_uri => uri, :code => 'CODE')
+    client.exchange_token(:redirect_uri => uri, :code => 'CODE')
 
 #### OAuth2 refresh token flow, upload a track and print its link
     # register a new client which will exchange an existing refresh_token for an access_token
