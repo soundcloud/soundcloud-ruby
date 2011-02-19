@@ -60,6 +60,19 @@ describe Soundcloud do
       its(:api_host) { should == 'api.sandbox-soundcloud.com' }
     end
     
+    describe "#authorize_url" do
+      it "should generate a authorize_url" do
+        subject.authorize_url(:redirect_uri => "http://come.back.to/me").should == 
+          "https://soundcloud.com/connect?response_type=code&client_id=client&redirect_uri=http://come.back.to/me"
+      end
+
+      it "should generate a authorize_url and include the passed display parameter" do
+        subject.authorize_url(:redirect_uri => "http://come.back.to/me", :display => "popup").should == 
+          "https://soundcloud.com/connect?response_type=code&client_id=client&redirect_uri=http://come.back.to/me&display=popup"
+      end
+      
+    end
+    
     describe "#on_exchange_token" do
       it "should store the passed block as option" do
         block = lambda {}

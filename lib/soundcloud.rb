@@ -58,8 +58,11 @@ class Soundcloud
   def api_host; [API_SUBHOST, host].join('.'); end
 
   def authorize_url(options={})
+    display = options.delete(:display)
     store_options(options)
-    "https://#{host}#{AUTHORIZE_PATH}?response_type=code&client_id=#{client_id}&redirect_uri=#{URI.escape redirect_uri}"
+    url = "https://#{host}#{AUTHORIZE_PATH}?response_type=code&client_id=#{client_id}&redirect_uri=#{URI.escape redirect_uri}"
+    url << "&display=#{display}" if display
+    url
   end
   
   def exchange_token(options={})
