@@ -99,7 +99,8 @@ private
         # TODO it should return the original
         handle_response(false, &block)
       else
-        raise ResponseError.new(response), "HTTP Status #{response.code}"
+        error = Crack::JSON.parse(response)['error'] rescue ''
+        raise ResponseError.new(response), "HTTP status: #{response.code} error: #{error}"
       end
     elsif response.is_a? Hash
       HashResponseWrapper.new(response)

@@ -45,8 +45,8 @@ describe Soundcloud do
         end
 
         it "should raise an error if request not successful" do
-          FakeWeb.register_uri(method, "http://api.soundcloud.com/tracks?consumer_key=client", :status => ["402", "Payment required"])
-          lambda do
+          FakeWeb.register_uri(method, "http://api.soundcloud.com/tracks?consumer_key=client", :status => ["402", "Payment required"], :body => "{'error': 'you need to pay'}")
+          lambda do 
             subject.send(method, '/tracks')
           end.should raise_error Soundcloud::ResponseError
         end
