@@ -5,7 +5,15 @@ require 'hashie'
 require 'uri'
 
 class Soundcloud
-  class ResponseError < HTTParty::ResponseError; end
+  class ResponseError < HTTParty::ResponseError
+    def self.message(response)
+      error = response.parsed_response['error'] || response.parsed_response['errors']['error']
+      "HTTP status: #{response.code} error: #{error}"
+    rescue
+      "HTTP status: #{response.code}"
+    end
+  end
+
   include HTTMultiParty
   headers 'Accept' => 'application/json'
   
@@ -94,13 +102,12 @@ private
   def handle_response(refreshing_enabled=true, &block)
     response = block.call
     if response && !response.success?
-      if response.code == 401 && response["error"] == "invalid_grant" && refreshing_enabled
+      if response.code == 401 && refreshing_enabled
         exchange_token
         # TODO it should return the original
         handle_response(false, &block)
       else
-        error = Crack::JSON.parse(response)['error'] rescue ''
-        raise ResponseError.new(response), "HTTP status: #{response.code} error: #{error}"
+        raise ResponseError.new(response), ResponseError.message(response)
       end
     elsif response.is_a? Hash
       HashResponseWrapper.new(response)
