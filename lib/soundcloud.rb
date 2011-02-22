@@ -15,7 +15,6 @@ class Soundcloud
   end
 
   include HTTMultiParty
-  headers 'Accept' => 'application/json'
   
   # TODO fix when api is ready for client_id
   CLIENT_ID_PARAM_NAME  = :consumer_key
@@ -132,8 +131,8 @@ private
     
     scheme = use_ssl? ? 'https' : 'http'
     options = options.dup
-    #options.delete(:body) if options[:body] == {}
     options[body_or_query] ||= {}
+    options[body_or_query][:format] = "json"
     if access_token
       options[body_or_query][:oauth_token] = access_token
     else
