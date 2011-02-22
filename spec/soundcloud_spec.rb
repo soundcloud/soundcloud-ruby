@@ -16,7 +16,7 @@ describe Soundcloud do
     its(:host)            { should == 'soundcloud.com' }
     its(:api_host)        { should == 'api.soundcloud.com' }
 
-    METHODS.each do |method|
+    [:get, :delete, :head].each do |method|
       describe "##{method}" do
         it "should accept urls as path and rewrite them" do
           Soundcloud.should_receive(method).with('http://api.soundcloud.com/tracks/123', {:query => {:consumer_key => 'client'}})
@@ -51,6 +51,44 @@ describe Soundcloud do
           end.should raise_error Soundcloud::ResponseError
         end
       end
+      
+      [:post, :put].each do |method|
+        describe "##{method}" do
+          it "should accept urls as path and rewrite them" do
+            Soundcloud.should_receive(method).with('http://api.soundcloud.com/tracks/123', {:body => {:consumer_key => 'client'}})
+            subject.send(method, 'http://api.soundcloud.com/tracks/123')
+          end
+
+          it "should preserve query string in path" do
+            FakeWeb.register_uri(method, "http://api.soundcloud.com/tracks?created_with_app_id=124", :body => "[{'title': 'bla'}]", :content_type => "application/json")
+            subject.send(method, '/tracks?created_with_app_id=124').should be_an_instance_of Soundcloud::ArrayResponseWrapper
+          end
+
+          it "should pass the client_id as consumer_key (LEGACY) to .#{method}" do
+            # TODO fix when api is ready for client_id
+            Soundcloud.should_receive(method).with('http://api.soundcloud.com/tracks', {:body => {:limit => 2, :consumer_key => 'client'}})
+            subject.send(method, '/tracks', :limit => 2)
+          end
+
+          it "should wrap the response object in a Response" do
+            FakeWeb.register_uri(method, "http://api.soundcloud.com/tracks/123", :body => "{'title': 'bla'}", :content_type => "application/json")
+            subject.send(method, '/tracks/123').should be_an_instance_of Soundcloud::HashResponseWrapper
+          end
+
+          it "should wrap the response array in an array of ResponseMash" do
+            FakeWeb.register_uri(method, "http://api.soundcloud.com/tracks", :body => "[{'title': 'bla'}]", :content_type => "application/json")
+            subject.send(method, '/tracks').should be_an_instance_of Soundcloud::ArrayResponseWrapper
+          end
+
+          it "should raise an error if request not successful" do
+            FakeWeb.register_uri(method, "http://api.soundcloud.com/tracks", :status => ["402", "Payment required"])
+            lambda do
+              subject.send(method, '/tracks')
+            end.should raise_error Soundcloud::ResponseError
+          end
+        end
+      end
+      
     end
   
     context 'and site = sandbox-soundcloud.com' do
@@ -63,12 +101,12 @@ describe Soundcloud do
     describe "#authorize_url" do
       it "should generate a authorize_url" do
         subject.authorize_url(:redirect_uri => "http://come.back.to/me").should == 
-          "https://soundcloud.com/connect?response_type=code&client_id=client&redirect_uri=http://come.back.to/me"
+          "https://soundcloud.com/connect?response_type=code_and_token&client_id=client&redirect_uri=http://come.back.to/me"
       end
 
       it "should generate a authorize_url and include the passed display parameter" do
         subject.authorize_url(:redirect_uri => "http://come.back.to/me", :display => "popup").should == 
-          "https://soundcloud.com/connect?response_type=code&client_id=client&redirect_uri=http://come.back.to/me&display=popup"
+          "https://soundcloud.com/connect?response_type=code_and_token&client_id=client&redirect_uri=http://come.back.to/me&display=popup"
       end
       
     end
@@ -191,7 +229,7 @@ describe Soundcloud do
     its(:access_token)    { should == 'ac' }
     its(:use_ssl?)        { should be_true }
     
-    METHODS.each do |method|
+    [:get, :head, :delete].each do |method|
       describe "##{method}" do
         it "should pass the oauth_token parameter when doing a request" do
           Soundcloud.should_receive(method).with('https://api.soundcloud.com/tracks', {:query => {:oauth_token => 'ac'}})

@@ -30,11 +30,11 @@ class Soundcloud
     raise ArgumentError, "At least a client_id or an access_token must be present" if client_id.nil? && access_token.nil?
   end
 
-  def get   (path, query={}, options={}); handle_response { self.class.get    *construct_query_arguments(path, options.merge(:query => query)) } end
-  def post  (path, query={}, options={}); handle_response { self.class.post   *construct_query_arguments(path, options.merge(:query => query)) } end
-  def put   (path, query={}, options={}); handle_response { self.class.put    *construct_query_arguments(path, options.merge(:query => query)) } end
-  def delete(path, query={}, options={}); handle_response { self.class.delete *construct_query_arguments(path, options.merge(:query => query)) } end
-  def head  (path, query={}, options={}); handle_response { self.class.head   *construct_query_arguments(path, options.merge(:query => query)) } end
+  def get   (path, query={}, options={}); handle_response { self.class.get     *construct_query_arguments(path, options.merge(:query => query)) } end
+  def post  (path, body={}, options={});  handle_response { self.class.post    *construct_query_arguments(path, options.merge(:body => body), :body) } end
+  def put   (path, body={}, options={});  handle_response { self.class.put     *construct_query_arguments(path, options.merge(:body => body), :body) } end
+  def delete(path, query={}, options={});  handle_response { self.class.delete *construct_query_arguments(path, options.merge(:query => query)) } end
+  def head  (path, query={}, options={}); handle_response { self.class.head    *construct_query_arguments(path, options.merge(:query => query)) } end
 
   # accessors for options
   def client_id;      @options[:client_id];     end
@@ -60,7 +60,7 @@ class Soundcloud
   def authorize_url(options={})
     display = options.delete(:display)
     store_options(options)
-    url = "https://#{host}#{AUTHORIZE_PATH}?response_type=code&client_id=#{client_id}&redirect_uri=#{URI.escape redirect_uri}"
+    url = "https://#{host}#{AUTHORIZE_PATH}?response_type=code_and_token&client_id=#{client_id}&redirect_uri=#{URI.escape redirect_uri}"
     url << "&display=#{display}" if display
     url
   end
@@ -118,18 +118,18 @@ private
   end
   
 
-  def construct_query_arguments(path_or_uri, options={})
+  def construct_query_arguments(path_or_uri, options={}, body_or_query=:query)
     uri = URI.parse(path_or_uri)
     path = uri.path
     
     scheme = use_ssl? ? 'https' : 'http'
     options = options.dup
-    options[:query] ||= {}
-
+    #options.delete(:body) if options[:body] == {}
+    options[body_or_query] ||= {}
     if access_token
-      options[:query][:oauth_token] = access_token
+      options[body_or_query][:oauth_token] = access_token
     else
-      options[:query][CLIENT_ID_PARAM_NAME] = client_id
+      options[body_or_query][CLIENT_ID_PARAM_NAME] = client_id
     end
     [
       "#{scheme}://#{api_host}#{path}#{uri.query ? "?#{uri.query}" : ""}",
