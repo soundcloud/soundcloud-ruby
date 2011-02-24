@@ -144,7 +144,7 @@ describe Soundcloud do
     it "should raise a response error when exchanging token results in 401" do
       lambda do
         FakeWeb.register_uri(:post, 
-          "https://api.soundcloud.com/oauth2/token?grant_type=refresh_token&refresh_token=as&client_id=x&client_secret=bang", 
+          "https://api.soundcloud.com/oauth2/token", #"?grant_type=refresh_token&refresh_token=as&client_id=x&client_secret=bang", 
           :status => [401, "Unauthorized"],
           :body => '{error: "invalid_client"}', 
           :content_type => "application/json"
@@ -240,13 +240,13 @@ describe Soundcloud do
         it "should try to refresh the token if it is expired and retry" do
           FakeWeb.register_uri(method, "https://api.soundcloud.com/tracks/1?format=json&oauth_token=ac", :status => ['401', "Unauthorized"], :body => "{'error': 'invalid_grant'}", :content_type => "application/json")
           FakeWeb.register_uri(:post, 
-            "https://api.soundcloud.com/oauth2/token?grant_type=refresh_token&refresh_token=ce&client_id=client&client_secret=sect", 
+            "https://api.soundcloud.com/oauth2/token", #"?grant_type=refresh_token&refresh_token=ce&client_id=client&client_secret=sect",
             :body => '{"access_token":  "new_access_token", "expires_in": 3600, "scope": null, "refresh_token": "04u7h-r3fr35h-70k3n"}', 
             :content_type => "application/json"
           )
 
           FakeWeb.register_uri(method, "https://api.soundcloud.com/tracks/1?format=json&oauth_token=new_access_token", :body => "{'title': 'test'}", :content_type => "application/json")
-
+ 
           lambda do 
             response = subject.send(method, '/tracks/1')
             response.title.should == 'test'
