@@ -10,6 +10,7 @@ describe Soundcloud do
 
   context 'initialized with a client id' do
     subject { Soundcloud.new(:client_id => 'client') }
+    its(:options)         { should include :client_id }
     its(:client_id)       { should == 'client' }
     its(:use_ssl?)        { should be_false }
     its(:site)            { should == 'soundcloud.com' }

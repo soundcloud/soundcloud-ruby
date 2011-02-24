@@ -26,6 +26,7 @@ class Soundcloud
     :on_exchange_token => lambda {}
   }
 
+  attr_accessor :options
 
   def initialize(options={})
     store_options(options)
