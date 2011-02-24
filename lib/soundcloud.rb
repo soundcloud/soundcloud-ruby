@@ -148,4 +148,4 @@ end
 
 require 'soundcloud/array_response_wrapper'
 require 'soundcloud/hash_response_wrapper'
-
+require 'soundcloud/version'
