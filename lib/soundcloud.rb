@@ -90,7 +90,7 @@ class Soundcloud
     }
     @options.merge!(:access_token => response.access_token, :refresh_token => response.refresh_token)
     @options[:expires_at] = Time.now + response.expires_in
-    @options[:on_exchange_token].call
+    @options[:on_exchange_token].call(*[(self if @options[:on_exchange_token].arity == 1)].compact)
     response
   end
 

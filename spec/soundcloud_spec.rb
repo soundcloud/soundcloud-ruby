@@ -212,7 +212,7 @@ describe Soundcloud do
       it "should call the on_exchange_token callback if it refreshes a token" do
         subject.class.stub!(:post).and_return(fake_token_response)
         called = false
-        subject.on_exchange_token { called = true }
+        subject.on_exchange_token { |soundcloud| soundcloud.should == subject; called = true }
         subject.exchange_token(:username => 'foo@bar.com', :password => 'pass')
         called.should be_true
       end
