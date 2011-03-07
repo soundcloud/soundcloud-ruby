@@ -1,5 +1,3 @@
-gem 'httmultiparty'
-gem 'hashie'
 require 'httmultiparty'
 require 'hashie'
 require 'uri'
