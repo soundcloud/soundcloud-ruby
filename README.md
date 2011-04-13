@@ -1,5 +1,5 @@
 # Soundcloud API Wrapper
-## Declientription
+## Description
 The Soundcloud gem is a thin wrapper for the Soundcloud API based of the httparty gem.
 It is providing simple methods to handle authorization and to execute HTTP calls.
 
