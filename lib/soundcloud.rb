@@ -14,8 +14,7 @@ class Soundcloud
 
   include HTTMultiParty
   
-  # TODO fix when api is ready for client_id
-  CLIENT_ID_PARAM_NAME  = :consumer_key
+  CLIENT_ID_PARAM_NAME  = :client_id
   API_SUBHOST           = 'api'
   AUTHORIZE_PATH        = '/connect'
   TOKEN_PATH            = '/oauth2/token'

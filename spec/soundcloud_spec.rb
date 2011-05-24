@@ -20,33 +20,33 @@ describe Soundcloud do
     [:get, :delete, :head].each do |method|
       describe "##{method}" do
         it "should accept urls as path and rewrite them" do
-          Soundcloud.should_receive(method).with('http://api.soundcloud.com/tracks/123', {:query => {:format => "json", :consumer_key => 'client'}})
+          Soundcloud.should_receive(method).with('http://api.soundcloud.com/tracks/123', {:query => {:format => "json", :client_id => 'client'}})
           subject.send(method, 'http://api.soundcloud.com/tracks/123')
         end
 
         it "should preserve query string in path" do
-          FakeWeb.register_uri(method, "http://api.soundcloud.com/tracks?consumer_key=client&created_with_app_id=124&format=json", :body => "[{'title': 'bla'}]", :content_type => "application/json")
+          FakeWeb.register_uri(method, "http://api.soundcloud.com/tracks?client_id=client&created_with_app_id=124&format=json", :body => "[{'title': 'bla'}]", :content_type => "application/json")
           subject.send(method, '/tracks?created_with_app_id=124').should be_an_instance_of Soundcloud::ArrayResponseWrapper
         end
         
-        it "should pass the client_id as consumer_key (LEGACY) to .#{method}" do
+        it "should pass the client_id as client_id (LEGACY) to .#{method}" do
           # TODO fix when api is ready for client_id
-          Soundcloud.should_receive(method).with('http://api.soundcloud.com/tracks', {:query => {:consumer_key => 'client', :limit => 2, :format => "json"}})
+          Soundcloud.should_receive(method).with('http://api.soundcloud.com/tracks', {:query => {:client_id => 'client', :limit => 2, :format => "json"}})
           subject.send(method, '/tracks', :limit => 2)
         end
         
         it "should wrap the response object in a Response" do
-          FakeWeb.register_uri(method, "http://api.soundcloud.com/tracks/123?format=json&consumer_key=client", :body => "{'title': 'bla'}", :content_type => "application/json")
+          FakeWeb.register_uri(method, "http://api.soundcloud.com/tracks/123?format=json&client_id=client", :body => "{'title': 'bla'}", :content_type => "application/json")
           subject.send(method, '/tracks/123').should be_an_instance_of Soundcloud::HashResponseWrapper
         end
 
         it "should wrap the response array in an array of ResponseMash" do
-          FakeWeb.register_uri(method, "http://api.soundcloud.com/tracks?format=json&consumer_key=client", :body => "[{'title': 'bla'}]", :content_type => "application/json")
+          FakeWeb.register_uri(method, "http://api.soundcloud.com/tracks?format=json&client_id=client", :body => "[{'title': 'bla'}]", :content_type => "application/json")
           subject.send(method, '/tracks').should be_an_instance_of Soundcloud::ArrayResponseWrapper
         end
 
         it "should raise an error if request not successful" do
-          FakeWeb.register_uri(method, "http://api.soundcloud.com/tracks?format=json&consumer_key=client", :status => ["402", "Payment required"], :body => "{'error': 'you need to pay'}")
+          FakeWeb.register_uri(method, "http://api.soundcloud.com/tracks?format=json&client_id=client", :status => ["402", "Payment required"], :body => "{'error': 'you need to pay'}")
           lambda do 
             subject.send(method, '/tracks')
           end.should raise_error Soundcloud::ResponseError
@@ -56,7 +56,7 @@ describe Soundcloud do
       [:post, :put].each do |method|
         describe "##{method}" do
           it "should accept urls as path and rewrite them" do
-            Soundcloud.should_receive(method).with('http://api.soundcloud.com/tracks/123', {:body => {:format => "json", :consumer_key => 'client'}})
+            Soundcloud.should_receive(method).with('http://api.soundcloud.com/tracks/123', {:body => {:format => "json", :client_id => 'client'}})
             subject.send(method, 'http://api.soundcloud.com/tracks/123')
           end
 
@@ -65,9 +65,9 @@ describe Soundcloud do
             subject.send(method, '/tracks?created_with_app_id=124').should be_an_instance_of Soundcloud::ArrayResponseWrapper
           end
 
-          it "should pass the client_id as consumer_key (LEGACY) to .#{method}" do
+          it "should pass the client_id as client_id (LEGACY) to .#{method}" do
             # TODO fix when api is ready for client_id
-            Soundcloud.should_receive(method).with('http://api.soundcloud.com/tracks', {:body => {:limit => 2, :format => "json", :consumer_key => 'client'}})
+            Soundcloud.should_receive(method).with('http://api.soundcloud.com/tracks', {:body => {:limit => 2, :format => "json", :client_id => 'client'}})
             subject.send(method, '/tracks', :limit => 2)
           end
 
