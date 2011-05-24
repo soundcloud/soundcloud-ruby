@@ -94,8 +94,9 @@ Stores the passed options and try to exchange tokens if no access_token is prese
 - client_id, client_secret, redirect_uri, code is present
 
 #### Soundcloud#authorize_url(options={})
-Stores the passed options and return an authorize url.
-The client_id and redirect_uri options need to present to generate the authorize url.
+Stores the passed options except for ``state`` and ``display`` and return an authorize url.
+The ``client_id`` and ``redirect_uri`` options need to present to generate the authorize url.
+The ``state`` and ``display`` options can be used to set the parameters accordingly in the authorize url.
 
 #### Soundcloud#get, Soundcloud#post, Soundcloud#put, Soundcloud#delete, Soundcloud#head
 These methods expose all available HTTP methods. They all share the signature (path_or_uri, query={}, options={}).

@@ -109,7 +109,11 @@ describe Soundcloud do
         subject.authorize_url(:redirect_uri => "http://come.back.to/me", :display => "popup").should == 
           "https://soundcloud.com/connect?response_type=code_and_token&client_id=client&redirect_uri=http://come.back.to/me&display=popup"
       end
-      
+
+      it "should generate a authorize_url and include the passed state parameter" do
+        subject.authorize_url(:redirect_uri => "http://come.back.to/me", :state => "hell&yeah").should == 
+          "https://soundcloud.com/connect?response_type=code_and_token&client_id=client&redirect_uri=http://come.back.to/me&state=hell%26yeah"
+      end
     end
     
     describe "#on_exchange_token" do

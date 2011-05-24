@@ -38,7 +38,7 @@ class Soundcloud
   def get   (path, query={}, options={}); handle_response { self.class.get     *construct_query_arguments(path, options.merge(:query => query)) } end
   def post  (path, body={}, options={});  handle_response { self.class.post    *construct_query_arguments(path, options.merge(:body => body), :body) } end
   def put   (path, body={}, options={});  handle_response { self.class.put     *construct_query_arguments(path, options.merge(:body => body), :body) } end
-  def delete(path, query={}, options={});  handle_response { self.class.delete *construct_query_arguments(path, options.merge(:query => query)) } end
+  def delete(path, query={}, options={}); handle_response { self.class.delete *construct_query_arguments(path, options.merge(:query => query)) } end
   def head  (path, query={}, options={}); handle_response { self.class.head    *construct_query_arguments(path, options.merge(:query => query)) } end
 
   # accessors for options
@@ -64,9 +64,11 @@ class Soundcloud
 
   def authorize_url(options={})
     display = options.delete(:display)
+    state   = options.delete(:state)
     store_options(options)
     url = "https://#{host}#{AUTHORIZE_PATH}?response_type=code_and_token&client_id=#{client_id}&redirect_uri=#{URI.escape redirect_uri}"
-    url << "&display=#{display}" if display
+    url << "&display=#{CGI.escape display}" if display
+    url << "&state=#{CGI.escape state}"   if state
     url
   end
   
