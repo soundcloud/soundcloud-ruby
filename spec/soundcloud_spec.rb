@@ -172,8 +172,6 @@ describe Soundcloud do
         subject.refresh_token.should == 'ref'
       end
 
-      it "should raise an error if response is a 401 not"
-
       it "should call authorize endpoint to exchange token and store them when refresh token is passed" do
         subject.class.stub!(:post)
         Soundcloud.should_receive(:post).with('https://api.soundcloud.com/oauth2/token', :query => {
@@ -225,6 +223,24 @@ describe Soundcloud do
         subject.class.stub!(:post).and_return(fake_token_response)
         subject.exchange_token(:username => 'foo@bar.com', :password => 'pass')
         subject.expires_at.to_i.should == (Time.now + 3600).to_i
+      end
+    end
+  end
+  
+  context 'initialized with access_token' do
+    subject { Soundcloud.new(:access_token => 'ac', :client_id => 'client', :client_secret => 'sect') }
+    
+    describe "#get" do
+      it "should fail with InvalidAccessTokenException when access token is invalid" do
+        FakeWeb.register_uri(:get, 
+          "https://api.soundcloud.com/me?format=json&oauth_token=ac",
+          :status => [401, "Unauthorized"],
+          :body => '', 
+          :content_type => "application/json"
+        )
+        lambda do
+          subject.send(:get, '/me')
+        end.should raise_error Soundcloud::ResponseError
       end
     end
   end
