@@ -127,13 +127,13 @@ class Soundcloud
   def api_host; [API_SUBHOST, host].join('.'); end
 
   def authorize_url(options={})
-    display = options.delete(:display)
-    state   = options.delete(:state)
+    additional_params = [:display, :state, :scope].map do |param_name|
+      value = options.delete(param_name)
+      "#{param_name}=#{CGI.escape value}" unless value.nil?
+    end.compact.join("&")
+
     store_options(options)
-    url = "https://#{host}#{AUTHORIZE_PATH}?response_type=code_and_token&client_id=#{client_id}&redirect_uri=#{URI.escape redirect_uri}"
-    url << "&display=#{CGI.escape display}" if display
-    url << "&state=#{CGI.escape state}"   if state
-    url
+    "https://#{host}#{AUTHORIZE_PATH}?response_type=code_and_token&client_id=#{client_id}&redirect_uri=#{URI.escape redirect_uri}&#{additional_params}"
   end
   
   def exchange_token(options={})

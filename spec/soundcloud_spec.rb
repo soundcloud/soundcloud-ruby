@@ -102,7 +102,7 @@ describe Soundcloud do
     describe "#authorize_url" do
       it "should generate a authorize_url" do
         subject.authorize_url(:redirect_uri => "http://come.back.to/me").should == 
-          "https://soundcloud.com/connect?response_type=code_and_token&client_id=client&redirect_uri=http://come.back.to/me"
+          "https://soundcloud.com/connect?response_type=code_and_token&client_id=client&redirect_uri=http://come.back.to/me&"
       end
 
       it "should generate a authorize_url and include the passed display parameter" do
@@ -113,6 +113,16 @@ describe Soundcloud do
       it "should generate a authorize_url and include the passed state parameter" do
         subject.authorize_url(:redirect_uri => "http://come.back.to/me", :state => "hell&yeah").should == 
           "https://soundcloud.com/connect?response_type=code_and_token&client_id=client&redirect_uri=http://come.back.to/me&state=hell%26yeah"
+      end
+      
+      it "should generate a authorize_url and include the passed scope parameter" do
+        subject.authorize_url(:redirect_uri => "http://come.back.to/me", :scope => "non-expiring").should == 
+          "https://soundcloud.com/connect?response_type=code_and_token&client_id=client&redirect_uri=http://come.back.to/me&scope=non-expiring"
+      end
+      
+      it "should generate a authorize_url and include the passed scope and state parameter" do
+        subject.authorize_url(:redirect_uri => "http://come.back.to/me", :scope => "non-expiring", :state => "blub").should == 
+          "https://soundcloud.com/connect?response_type=code_and_token&client_id=client&redirect_uri=http://come.back.to/me&state=blub&scope=non-expiring"
       end
     end
     
