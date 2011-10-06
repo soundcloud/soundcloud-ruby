@@ -42,11 +42,14 @@ It is providing simple methods to handle authorization and to execute HTTP calls
     client = Soundcloud.new({
       :client_id      => YOUR_CLIENT_ID,
       :client_secret  => YOUR_CLIENT_SECRET,
+      :redirect_uri  => YOUR_REDIRECT_URI,
     })
     
-    client.authorize_url(:redirect_uri => REDIRECT_URI)
-    # => "https://soundcloud.com/connect?client_id=YOUR_CLIENT_ID&response_type=code&redirect_uri=http://host/redirect"
-    client.exchange_token(:redirect_uri => uri, :code => 'CODE')
+    redirect client.authorize_url()
+    # the user should be redirected to "https://soundcloud.com/connect?client_id=YOUR_CLIENT_ID&response_type=code&redirect_uri=YOUR_REDIRECT_URI"
+    # after granting access he will be redirected back to YOUR_REDIRECT_URI
+    # in your respective handler you can build an exchange token from the transmitted code
+    client.exchange_token(:code => params[:code])
 
 #### OAuth2 refresh token flow, upload a track and print its link
     # register a new client which will exchange an existing refresh_token for an access_token
