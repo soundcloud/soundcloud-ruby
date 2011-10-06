@@ -83,6 +83,13 @@ It is providing simple methods to handle authorization and to execute HTTP calls
     user_id_to_follow = 123
     client.put("/me/followings/#{user_id_to_follow}")
 
+### Initializing a client with an access token and updating the users profile description
+    # initializing a client with an access token
+    client = Soundcloud.new(:access_token => SOME_ACCESS_TOKEN)
+    
+    # updating the users profile description
+    client.put("/me", :user => {:description => "a new description"})
+
 ## Interface
 #### Soundcloud.new(options={})
 Stores the passed options and call exchange_token in case options are passed that allow an exchange of tokens.
