@@ -51,8 +51,14 @@ describe Soundcloud do
             subject.send(method, '/tracks')
           end.should raise_error Soundcloud::ResponseError
         end
+
+        it "should send a user agent header" do
+          FakeWeb.register_uri(method, "http://api.soundcloud.com/tracks?format=json&client_id=client", {})
+          subject.send(method, '/tracks')
+          FakeWeb.last_request["User-Agent"].should == "SoundCloud Ruby Wrapper #{Soundcloud::VERSION}"
+        end
       end
-      
+
       [:post, :put].each do |method|
         describe "##{method}" do
           it "should accept urls as path and rewrite them" do

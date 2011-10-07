@@ -1,6 +1,7 @@
 require 'httmultiparty'
 require 'hashie'
 require 'uri'
+require 'soundcloud/version'
 
 class Soundcloud
   class ResponseError < HTTParty::ResponseError
@@ -75,9 +76,9 @@ class Soundcloud
   end
   
   class UnauthorizedResponseError < ResponseError; end
+  USER_AGENT            = "SoundCloud Ruby Wrapper #{VERSION}"
 
   include HTTMultiParty
-  
   CLIENT_ID_PARAM_NAME  = :client_id
   API_SUBHOST           = 'api'
   AUTHORIZE_PATH        = '/connect'
@@ -88,6 +89,7 @@ class Soundcloud
   }
 
   attr_accessor :options
+  headers({"User-Agent" => USER_AGENT})
 
   def initialize(options={})
     store_options(options)
@@ -100,9 +102,9 @@ class Soundcloud
   end
 
   def get   (path, query={}, options={}); handle_response { self.class.get     *construct_query_arguments(path, options.merge(:query => query)) } end
-  def post  (path, body={}, options={});  handle_response { self.class.post    *construct_query_arguments(path, options.merge(:body => body), :body) } end
-  def put   (path, body={}, options={});  handle_response { self.class.put     *construct_query_arguments(path, options.merge(:body => body), :body) } end
-  def delete(path, query={}, options={}); handle_response { self.class.delete *construct_query_arguments(path, options.merge(:query => query)) } end
+  def post  (path, body={},  options={}); handle_response { self.class.post    *construct_query_arguments(path, options.merge(:body  => body), :body) } end
+  def put   (path, body={},  options={}); handle_response { self.class.put     *construct_query_arguments(path, options.merge(:body  => body), :body) } end
+  def delete(path, query={}, options={}); handle_response { self.class.delete  *construct_query_arguments(path, options.merge(:query => query)) } end
   def head  (path, query={}, options={}); handle_response { self.class.head    *construct_query_arguments(path, options.merge(:query => query)) } end
 
   # accessors for options
@@ -213,4 +215,3 @@ end
 
 require 'soundcloud/array_response_wrapper'
 require 'soundcloud/hash_response_wrapper'
-require 'soundcloud/version'
