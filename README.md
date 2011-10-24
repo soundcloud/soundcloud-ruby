@@ -93,6 +93,30 @@ It is providing simple methods to handle authorization and to execute HTTP calls
     # updating the users profile description
     client.put("/me", :user => {:description => "a new description"})
 
+
+### Add a track to a playlist / set 
+    client = Soundcloud.new(:access_token => "A_VALID_TOKEN")
+    
+    # get my last playlist
+    playlist = client.get("/me/playlists").first
+    
+    # get ids of contained tracks
+    track_ids = playlist.tracks.map(&:id) # => [22448500, 21928809] 
+    
+    # adding a new track 21778201
+    track_ids << 21778201 # => [22448500, 21928809, 21778201]
+    
+    # map array of ids to array of track objects:
+    tracks = track_ids.map { |id| {:id => id} } # => [{:id=>22448500}, {:id=>21928809}, {:id=>21778201}]
+    
+    # send update/put request to playlist
+    playlist = client.put(playlist.uri, :playlist => {
+      :tracks => tracks
+    })
+    
+    # print the list of track ids of the updated playlist:
+    p playlist.tracks.map(&:id)
+
 ## Interface
 #### Soundcloud.new(options={})
 Stores the passed options and call exchange_token in case options are passed that allow an exchange of tokens.
