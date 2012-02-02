@@ -1,7 +1,7 @@
 # Soundcloud API Wrapper
 ## Description
-The Soundcloud gem is a thin wrapper for the Soundcloud API based of the httparty gem.
-It is providing simple methods to handle authorization and to execute HTTP calls.
+The Soundcloud gem is a thin wrapper for the Soundcloud API based off of the httparty gem.
+It provides simple methods to handle authorization and to execute HTTP calls.
 
 ## Requirements
 * httmultiparty
@@ -26,8 +26,8 @@ It is providing simple methods to handle authorization and to execute HTTP calls
   
 #### OAuth2 user credentials flow and print the username of the authenticated user
     # register a new client, which will exchange the username, password for an access_token
-    # NOTE: the SoundCloud API Docs advices to not use the user credentials flow in a web app.
-    # In any case never store the password of a user.
+    # NOTE: the SoundCloud API Docs advise not to use the user credentials flow in a web app.
+    # In any case, never store the password of a user.
     client = Soundcloud.new({
       :client_id      => YOUR_CLIENT_ID,
       :client_secret  => YOUR_CLIENT_SECRET,
@@ -151,5 +151,5 @@ Returns a date based on the expires_in attribute returned from a token exchange.
 Will return true or false depending on if expires_at is in the past.
 
 #### Error Handling
-In case a request was not successful a Soundcloud::ResponseError will be raise.
+In case a request was not successful a Soundcloud::ResponseError will be raised.
 The original HTTParty response is available through Soundcloud::ResponseError#response.
