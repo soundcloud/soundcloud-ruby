@@ -25,7 +25,7 @@ describe Soundcloud do
         end
 
         it "should preserve query string in path" do
-          FakeWeb.register_uri(method, "http://api.soundcloud.com/tracks?client_id=client&created_with_app_id=124&format=json", :body => "[{'title': 'bla'}]", :content_type => "application/json")
+          FakeWeb.register_uri(method, "http://api.soundcloud.com/tracks?client_id=client&created_with_app_id=124&format=json", :body => '[{"title": "bla"}]', :content_type => "application/json")
           subject.send(method, '/tracks?created_with_app_id=124').should be_an_instance_of Soundcloud::ArrayResponseWrapper
         end
         
@@ -36,12 +36,12 @@ describe Soundcloud do
         end
         
         it "should wrap the response object in a Response" do
-          FakeWeb.register_uri(method, "http://api.soundcloud.com/tracks/123?format=json&client_id=client", :body => "{'title': 'bla'}", :content_type => "application/json")
+          FakeWeb.register_uri(method, "http://api.soundcloud.com/tracks/123?format=json&client_id=client", :body => '{"title": "bla"}', :content_type => "application/json")
           subject.send(method, '/tracks/123').should be_an_instance_of Soundcloud::HashResponseWrapper
         end
 
         it "should wrap the response array in an array of ResponseMash" do
-          FakeWeb.register_uri(method, "http://api.soundcloud.com/tracks?format=json&client_id=client", :body => "[{'title': 'bla'}]", :content_type => "application/json")
+          FakeWeb.register_uri(method, "http://api.soundcloud.com/tracks?format=json&client_id=client", :body => '[{"title": "bla"}]', :content_type => "application/json")
           subject.send(method, '/tracks').should be_an_instance_of Soundcloud::ArrayResponseWrapper
         end
 
@@ -67,7 +67,7 @@ describe Soundcloud do
           end
 
           it "should preserve query string in path" do
-            FakeWeb.register_uri(method, "http://api.soundcloud.com/tracks?created_with_app_id=124", :body => "[{'title': 'bla'}]", :content_type => "application/json")
+            FakeWeb.register_uri(method, "http://api.soundcloud.com/tracks?created_with_app_id=124", :body => '[{"title": "bla"}]', :content_type => "application/json")
             subject.send(method, '/tracks?created_with_app_id=124').should be_an_instance_of Soundcloud::ArrayResponseWrapper
           end
 
@@ -78,12 +78,12 @@ describe Soundcloud do
           end
 
           it "should wrap the response object in a Response" do
-            FakeWeb.register_uri(method, "http://api.soundcloud.com/tracks/123", :body => "{'title': 'bla'}", :content_type => "application/json")
+            FakeWeb.register_uri(method, "http://api.soundcloud.com/tracks/123", :body => '{"title": "bla"}', :content_type => "application/json")
             subject.send(method, '/tracks/123').should be_an_instance_of Soundcloud::HashResponseWrapper
           end
 
           it "should wrap the response array in an array of ResponseMash" do
-            FakeWeb.register_uri(method, "http://api.soundcloud.com/tracks", :body => "[{'title': 'bla'}]", :content_type => "application/json")
+            FakeWeb.register_uri(method, "http://api.soundcloud.com/tracks", :body => '[{"title": "bla"}]', :content_type => "application/json")
             subject.send(method, '/tracks').should be_an_instance_of Soundcloud::ArrayResponseWrapper
           end
 
@@ -274,14 +274,14 @@ describe Soundcloud do
         end
 
         it "should try to refresh the token if it is expired and retry" do
-          FakeWeb.register_uri(method, "https://api.soundcloud.com/tracks/1?format=json&oauth_token=ac", :status => ['401', "Unauthorized"], :body => "{'error': 'invalid_grant'}", :content_type => "application/json")
+          FakeWeb.register_uri(method, "https://api.soundcloud.com/tracks/1?format=json&oauth_token=ac", :status => ['401', "Unauthorized"], :body => '{"error": "invalid_grant"}', :content_type => "application/json")
           FakeWeb.register_uri(:post, 
             "https://api.soundcloud.com/oauth2/token", #"?grant_type=refresh_token&refresh_token=ce&client_id=client&client_secret=sect",
             :body => '{"access_token":  "new_access_token", "expires_in": 3600, "scope": null, "refresh_token": "04u7h-r3fr35h-70k3n"}', 
             :content_type => "application/json"
           )
 
-          FakeWeb.register_uri(method, "https://api.soundcloud.com/tracks/1?format=json&oauth_token=new_access_token", :body => "{'title': 'test'}", :content_type => "application/json")
+          FakeWeb.register_uri(method, "https://api.soundcloud.com/tracks/1?format=json&oauth_token=new_access_token", :body => '{"title": "test"}', :content_type => "application/json")
  
           lambda do 
             response = subject.send(method, '/tracks/1')
