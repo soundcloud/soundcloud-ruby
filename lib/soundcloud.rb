@@ -101,11 +101,11 @@ class Soundcloud
     raise ArgumentError, "At least a client_id or an access_token must be present" if client_id.nil? && access_token.nil?
   end
 
-  def get   (path, query={}, options={}); handle_response { self.class.get     *construct_query_arguments(path, options.merge(:query => query)) } end
-  def post  (path, body={},  options={}); handle_response { self.class.post    *construct_query_arguments(path, options.merge(:body  => body), :body) } end
-  def put   (path, body={},  options={}); handle_response { self.class.put     *construct_query_arguments(path, options.merge(:body  => body), :body) } end
-  def delete(path, query={}, options={}); handle_response { self.class.delete  *construct_query_arguments(path, options.merge(:query => query)) } end
-  def head  (path, query={}, options={}); handle_response { self.class.head    *construct_query_arguments(path, options.merge(:query => query)) } end
+  def get   (path, query={}, options={}); handle_response { self.class.get(    *construct_query_arguments(path, options.merge(:query => query)) ) } end
+  def post  (path, body={},  options={}); handle_response { self.class.post(   *construct_query_arguments(path, options.merge(:body  => body), :body) ) } end
+  def put   (path, body={},  options={}); handle_response { self.class.put(    *construct_query_arguments(path, options.merge(:body  => body), :body) ) } end
+  def delete(path, query={}, options={}); handle_response { self.class.delete( *construct_query_arguments(path, options.merge(:query => query)) ) } end
+  def head  (path, query={}, options={}); handle_response { self.class.head(   *construct_query_arguments(path, options.merge(:query => query)) ) } end
 
   # accessors for options
   def client_id;      @options[:client_id];     end
