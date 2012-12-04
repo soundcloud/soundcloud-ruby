@@ -74,7 +74,7 @@ class Soundcloud
       end
     end
   end
-  
+
   class UnauthorizedResponseError < ResponseError; end
   USER_AGENT            = "SoundCloud Ruby Wrapper #{VERSION}"
 
@@ -119,12 +119,12 @@ class Soundcloud
     (expires_at.nil? || expires_at < Time.now)
   end
 
-  def use_ssl?; 
+  def use_ssl?;
     !! @options[:use_ssl?] || access_token
   end
 
   def site; @options[:site]; end
-  
+
   def host; site; end
   def api_host; [API_SUBHOST, host].join('.'); end
 
@@ -137,7 +137,7 @@ class Soundcloud
     store_options(options)
     "https://#{host}#{AUTHORIZE_PATH}?response_type=code_and_token&client_id=#{client_id}&redirect_uri=#{URI.escape redirect_uri}&#{additional_params}"
   end
-  
+
   def exchange_token(options={})
     store_options(options)
     raise ArgumentError, 'client_id and client_secret is required to retrieve an access_token' if client_id.nil? || client_secret.nil?
@@ -191,12 +191,12 @@ private
     @options ||= DEFAULT_OPTIONS.dup
     @options.merge! options
   end
-  
+
 
   def construct_query_arguments(path_or_uri, options={}, body_or_query=:query)
     uri = URI.parse(path_or_uri)
     path = uri.path
-    
+
     scheme = use_ssl? ? 'https' : 'http'
     options = options.dup
     options[body_or_query] ||= {}
