@@ -178,6 +178,8 @@ private
       HashResponseWrapper.new(response)
     elsif response.is_a? Array
       ArrayResponseWrapper.new(response)
+    elsif response && response.success?
+      response
     end
   end
 
