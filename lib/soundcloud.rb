@@ -172,9 +172,7 @@ private
         # TODO it should return the original
         handle_response(false, &block)
       else
-        #raise ResponseError.new(response), ResponseError.message(response)
         raise ResponseError.new(response)
-        #raise ResponseError.from(response)
       end
     elsif response.is_a? Hash
       HashResponseWrapper.new(response)
