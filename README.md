@@ -78,14 +78,6 @@ It provides simple methods to handle authorization and to execute HTTP calls.
      # print the track id
      puts track.id
 
-#### Register a client for http://sandbox-soundcloud.com with an existing access_token and start following a user
-    # register a client for http://sandbox-soundcloud.com with existing access_token
-    client = Soundcloud.new(:site => 'sandbox-soundcloud.com', :access_token => SOME_ACCESS_TOKEN)
-
-    # create a new following
-    user_id_to_follow = 123
-    client.put("/me/followings/#{user_id_to_follow}")
-
 ### Initializing a client with an access token and updating the users profile description
     # initializing a client with an access token
     client = Soundcloud.new(:access_token => SOME_ACCESS_TOKEN)

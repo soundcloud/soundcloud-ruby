@@ -98,11 +98,11 @@ describe Soundcloud do
 
     end
 
-    context 'and site = sandbox-soundcloud.com' do
-      subject { Soundcloud.new(:client_id => 'client', :site => 'sandbox-soundcloud.com') }
-      its(:site)     { should == 'sandbox-soundcloud.com' }
-      its(:host)     { should == 'sandbox-soundcloud.com' }
-      its(:api_host) { should == 'api.sandbox-soundcloud.com' }
+    context 'and site = soundcloud.com' do
+      subject { Soundcloud.new(:client_id => 'client', :site => 'soundcloud.com') }
+      its(:site)     { should == 'soundcloud.com' }
+      its(:host)     { should == 'soundcloud.com' }
+      its(:api_host) { should == 'api.soundcloud.com' }
     end
 
     describe "#authorize_url" do
