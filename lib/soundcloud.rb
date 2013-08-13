@@ -1,88 +1,15 @@
-require 'httmultiparty'
 require 'hashie'
+require 'httmultiparty'
 require 'uri'
-require 'soundcloud/version'
+
 require 'soundcloud/array_response_wrapper'
 require 'soundcloud/hash_response_wrapper'
+require 'soundcloud/response_error'
+require 'soundcloud/version'
 
 class Soundcloud
-  class ResponseError < HTTParty::ResponseError
-    def message
-      error = response.parsed_response['error'] || response.parsed_response['errors']['error']
-      "HTTP status: #{StatusCodes.interpret_status(response.code)} Error: #{error}"
-    rescue
-      "HTTP status: #{StatusCodes.interpret_status(response.code)}"
-    end
-
-    module StatusCodes
-      STATUS_CODES = {
-        100 => "Continue",
-        101 => "Switching Protocols",
-        102 => "Processing",
-
-        200 => "OK",
-        201 => "Created",
-        202 => "Accepted",
-        203 => "Non-Authoritative Information",
-        204 => "No Content",
-        205 => "Reset Content",
-        206 => "Partial Content",
-        207 => "Multi-Status",
-        226 => "IM Used",
-
-        300 => "Multiple Choices",
-        301 => "Moved Permanently",
-        302 => "Found",
-        303 => "See Other",
-        304 => "Not Modified",
-        305 => "Use Proxy",
-        307 => "Temporary Redirect",
-
-        400 => "Bad Request",
-        401 => "Unauthorized",
-        402 => "Payment Required",
-        403 => "Forbidden",
-        404 => "Not Found",
-        405 => "Method Not Allowed",
-        406 => "Not Acceptable",
-        407 => "Proxy Authentication Required",
-        408 => "Request Timeout",
-        409 => "Conflict",
-        410 => "Gone",
-        411 => "Length Required",
-        412 => "Precondition Failed",
-        413 => "Request Entity Too Large",
-        414 => "Request-URI Too Long",
-        415 => "Unsupported Media Type",
-        416 => "Requested Range Not Satisfiable",
-        417 => "Expectation Failed",
-        422 => "Unprocessable Entity",
-        423 => "Locked",
-        424 => "Failed Dependency",
-        426 => "Upgrade Required",
-
-        500 => "Internal Server Error",
-        501 => "Not Implemented",
-        502 => "Bad Gateway",
-        503 => "Service Unavailable",
-        504 => "Gateway Timeout",
-        505 => "HTTP Version Not Supported",
-        507 => "Insufficient Storage",
-        510 => "Not Extended"
-      }
-
-      def self.interpret_status(status)
-        "#{status} #{STATUS_CODES[status.to_i]}".strip
-      end
-    end
-  end
-
-  class UnauthorizedResponseError < ResponseError
-  end
-
-  USER_AGENT            = "SoundCloud Ruby Wrapper #{VERSION}"
-
   include HTTMultiParty
+  USER_AGENT            = "SoundCloud Ruby Wrapper #{VERSION}"
   CLIENT_ID_PARAM_NAME  = :client_id
   API_SUBHOST           = 'api'
   AUTHORIZE_PATH        = '/connect'
@@ -246,7 +173,6 @@ private
     @options ||= DEFAULT_OPTIONS.dup
     @options.merge! options
   end
-
 
   def construct_query_arguments(path_or_uri, options={}, body_or_query=:query)
     uri = URI.parse(path_or_uri)

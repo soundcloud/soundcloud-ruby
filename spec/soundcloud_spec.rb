@@ -4,17 +4,17 @@ describe Soundcloud do
   it "should raise ArgumentError when initialized with no options" do
     lambda do
       Soundcloud.new
-    end.should raise_error ArgumentError
+    end.should raise_error(ArgumentError)
   end
 
   context 'initialized with a client id' do
     subject { Soundcloud.new(:client_id => 'client') }
-    its(:options)         { should include :client_id }
-    its(:client_id)       { should == 'client' }
-    its(:use_ssl?)        { should be_false }
-    its(:site)            { should == 'soundcloud.com' }
-    its(:host)            { should == 'soundcloud.com' }
-    its(:api_host)        { should == 'api.soundcloud.com' }
+    its(:options)   { should include :client_id }
+    its(:client_id) { should == 'client' }
+    its(:use_ssl?)  { should be_false }
+    its(:site)      { should == 'soundcloud.com' }
+    its(:host)      { should == 'soundcloud.com' }
+    its(:api_host)  { should == 'api.soundcloud.com' }
 
     [:get, :delete, :head].each do |method|
       describe "##{method}" do
@@ -56,7 +56,7 @@ describe Soundcloud do
             to_return(:status => 402, :body => "{'error': 'you need to pay'}")
           lambda do
             subject.send(method, '/tracks')
-          end.should raise_error Soundcloud::ResponseError
+          end.should raise_error(Soundcloud::ResponseError)
         end
 
         it "should send a user agent header" do
@@ -104,7 +104,7 @@ describe Soundcloud do
               to_return(:status => 402)
             lambda do
               subject.send(method, '/tracks')
-            end.should raise_error Soundcloud::ResponseError
+            end.should raise_error(Soundcloud::ResponseError)
           end
         end
       end
@@ -169,7 +169,7 @@ describe Soundcloud do
     it "should raise an argument error if client_secret no present" do
       lambda do
         Soundcloud.new(:client_id => 'x').exchange_token(:refresh_token => 'as')
-      end.should raise_error ArgumentError
+      end.should raise_error(ArgumentError)
     end
 
     it "should raise a response error when exchanging token results in 401" do
@@ -178,7 +178,7 @@ describe Soundcloud do
           with(:body => {:grant_type => "refresh_token", :refresh_token => "as", :client_id => "x", :client_secret => "bang"}).
           to_return(:status => 401, :body => '{error: "invalid_client"}', :headers => {:content_type => "application/json"})
         Soundcloud.new(:client_id => 'x', :client_secret => 'bang').exchange_token(:refresh_token => 'as')
-      end.should raise_error Soundcloud::ResponseError
+      end.should raise_error(Soundcloud::ResponseError)
     end
 
 
@@ -260,7 +260,7 @@ describe Soundcloud do
           to_return(:status => 401)
         lambda do
           subject.send(:get, '/me')
-        end.should raise_error Soundcloud::ResponseError
+        end.should raise_error(Soundcloud::ResponseError)
       end
     end
   end
