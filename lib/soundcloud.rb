@@ -2,6 +2,8 @@ require 'httmultiparty'
 require 'hashie'
 require 'uri'
 require 'soundcloud/version'
+require 'soundcloud/array_response_wrapper'
+require 'soundcloud/hash_response_wrapper'
 
 class Soundcloud
   class ResponseError < HTTParty::ResponseError
@@ -75,7 +77,9 @@ class Soundcloud
     end
   end
 
-  class UnauthorizedResponseError < ResponseError; end
+  class UnauthorizedResponseError < ResponseError
+  end
+
   USER_AGENT            = "SoundCloud Ruby Wrapper #{VERSION}"
 
   include HTTMultiParty
@@ -93,47 +97,89 @@ class Soundcloud
 
   def initialize(options={})
     store_options(options)
-    if access_token.nil? && (options_for_refresh_flow_present? ||
-                             options_for_credentials_flow_present? || options_for_code_flow_present?)
+    if access_token.nil? && (options_for_refresh_flow_present? || options_for_credentials_flow_present? || options_for_code_flow_present?)
       exchange_token
     end
-
     raise ArgumentError, "At least a client_id or an access_token must be present" if client_id.nil? && access_token.nil?
   end
 
-  def get   (path, query={}, options={}); handle_response { self.class.get(    *construct_query_arguments(path, options.merge(:query => query)) ) } end
-  def post  (path, body={},  options={}); handle_response { self.class.post(   *construct_query_arguments(path, options.merge(:body  => body), :body) ) } end
-  def put   (path, body={},  options={}); handle_response { self.class.put(    *construct_query_arguments(path, options.merge(:body  => body), :body) ) } end
-  def delete(path, query={}, options={}); handle_response { self.class.delete( *construct_query_arguments(path, options.merge(:query => query)) ) } end
-  def head  (path, query={}, options={}); handle_response { self.class.head(   *construct_query_arguments(path, options.merge(:query => query)) ) } end
+  def get(path, query={}, options={})
+    handle_response {
+      self.class.get(*construct_query_arguments(path, options.merge(:query => query)))
+    }
+  end
+
+  def post(path, body={},  options={})
+    handle_response {
+      self.class.post(*construct_query_arguments(path, options.merge(:body  => body), :body))
+    }
+  end
+
+  def put(path, body={},  options={})
+    handle_response {
+      self.class.put(*construct_query_arguments(path, options.merge(:body  => body), :body))
+    }
+  end
+
+  def delete(path, query={}, options={})
+    handle_response {
+      self.class.delete(*construct_query_arguments(path, options.merge(:query => query)))
+    }
+  end
+
+  def head(path, query={}, options={})
+    handle_response {
+      self.class.head(*construct_query_arguments(path, options.merge(:query => query)))
+    }
+  end
 
   # accessors for options
-  def client_id;      @options[:client_id];     end
-  def client_secret;  @options[:client_secret]; end
-  def access_token;   @options[:access_token];  end
-  def refresh_token;  @options[:refresh_token]; end
-  def redirect_uri;   @options[:redirect_uri];  end
-  def expires_at;     @options[:expires_at];    end
+  def client_id
+    @options[:client_id]
+  end
+
+  def client_secret
+    @options[:client_secret]
+  end
+
+  def access_token
+    @options[:access_token]
+  end
+
+  def refresh_token
+    @options[:refresh_token]
+  end
+
+  def redirect_uri
+    @options[:redirect_uri]
+  end
+
+  def expires_at
+    @options[:expires_at]
+  end
 
   def expired?
     (expires_at.nil? || expires_at < Time.now)
   end
 
-  def use_ssl?;
-    !! @options[:use_ssl?] || access_token
+  def use_ssl?
+    !!(@options[:use_ssl?] || access_token)
   end
 
-  def site; @options[:site]; end
+  def site
+    @options[:site]
+  end
+  alias host site
 
-  def host; site; end
-  def api_host; [API_SUBHOST, host].join('.'); end
+  def api_host
+    [API_SUBHOST, host].join('.')
+  end
 
   def authorize_url(options={})
     additional_params = [:display, :state, :scope].map do |param_name|
       value = options.delete(param_name)
       "#{param_name}=#{CGI.escape value}" unless value.nil?
     end.compact.join("&")
-
     store_options(options)
     "https://#{host}#{AUTHORIZE_PATH}?response_type=code_and_token&client_id=#{client_id}&redirect_uri=#{URI.escape redirect_uri}&#{additional_params}"
   end
@@ -164,6 +210,7 @@ class Soundcloud
   end
 
 private
+
   def handle_response(refreshing_enabled=true, &block)
     response = block.call
     if response && !response.success?
@@ -174,18 +221,26 @@ private
       else
         raise ResponseError.new(response)
       end
-    elsif response.is_a? Hash
+    elsif response.is_a?(Hash)
       HashResponseWrapper.new(response)
-    elsif response.is_a? Array
+    elsif response.is_a?(Array)
       ArrayResponseWrapper.new(response)
     elsif response && response.success?
       response
     end
   end
 
-  def options_for_refresh_flow_present?;     !! @options[:refresh_token]; end
-  def options_for_credentials_flow_present?; !! @options[:username] && @options[:password]; end
-  def options_for_code_flow_present?;        !! @options[:code] && @options[:redirect_uri]; end
+  def options_for_refresh_flow_present?
+    !!@options[:refresh_token]
+  end
+
+  def options_for_credentials_flow_present?
+    !!(@options[:username] && @options[:password])
+  end
+
+  def options_for_code_flow_present?
+    !!(@options[:code] && @options[:redirect_uri])
+  end
 
   def store_options(options={})
     @options ||= DEFAULT_OPTIONS.dup
@@ -196,7 +251,6 @@ private
   def construct_query_arguments(path_or_uri, options={}, body_or_query=:query)
     uri = URI.parse(path_or_uri)
     path = uri.path
-
     scheme = use_ssl? ? 'https' : 'http'
     options = options.dup
     options[body_or_query] ||= {}
@@ -212,6 +266,3 @@ private
     ]
   end
 end
-
-require 'soundcloud/array_response_wrapper'
-require 'soundcloud/hash_response_wrapper'
