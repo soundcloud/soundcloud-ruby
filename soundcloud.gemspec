@@ -4,26 +4,24 @@ $:.unshift lib unless $:.include?(lib)
 
 require 'soundcloud/version'
 
-Gem::Specification.new do |s|
-  s.name        = "soundcloud"
-  s.rubyforge_project = "soundcloud"
-  s.version     = Soundcloud::VERSION
-  s.platform    = Gem::Platform::RUBY
-  s.authors     = ["Johannes Wagener"]
-  s.email       = ["johannes@soundcloud.com"]
-  s.homepage    = "http://dev.soundcloud.com"
-  s.summary     = "A simple Soundcloud API wrapper"
-  s.description = "A simple Soundcloud API wrapper based of httparty, multipart-post, httmultiparty"
+Gem::Specification.new do |spec|
+  spec.name        = 'soundcloud'
+  spec.version     = Soundcloud::VERSION
+  spec.platform    = Gem::Platform::RUBY
+  spec.authors     = ["Johannes Wagener"]
+  spec.email       = ["johannes@soundcloud.com"]
+  spec.homepage    = 'http://dev.soundcloud.com'
+  spec.summary     = "A simple Soundcloud API wrapper"
+  spec.description = spec.summary
 
-  s.required_rubygems_version = ">= 1.3.6"
+  spec.required_rubygems_version = '>= 1.3.5'
 
-  s.add_dependency 'httparty',      '>= 0.7.3'
-  s.add_dependency 'httmultiparty', '>= 0.3'
-  s.add_dependency 'hashie'
+  spec.add_dependency('httparty',      '~> 0.11.0')
+  spec.add_dependency('httmultiparty', '~> 0.3.0')
+  spec.add_dependency('hashie', '~> 2.0')
 
-  s.add_development_dependency "rspec", '~> 2.5.0'
-  s.add_development_dependency "fakeweb"
+  spec.add_development_dependency('bundler', '~> 1.0')
 
-  s.files        = Dir.glob("{lib}/**/*") + %w(README.md)
-  s.require_path = 'lib'
+  spec.files        = Dir.glob("lib/**/*") + %w(README.md)
+  spec.require_path = 'lib'
 end

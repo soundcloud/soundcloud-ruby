@@ -141,9 +141,7 @@ describe Soundcloud do
     end
 
     describe "#expired?" do
-      subject
       it "should be true if expires_at is in the past" do
-
         subject.instance_variable_get(:@options)[:expires_at] = Time.now - 60
         subject.should be_expired
       end
@@ -177,19 +175,19 @@ describe Soundcloud do
     context "when initialized with client_id, client_secret" do
       let(:fake_token_response) { {'access_token' => 'ac', 'expires_in' => 3600, 'scope' => "*", 'refresh_token' => 'ref'} }
       before do
-        fake_token_response.stub!(:success?).and_return(true)
+        fake_token_response.stub(:success?).and_return(true)
       end
 
       subject { Soundcloud.new(:client_id => 'client', :client_secret => 'secret') }
 
       it "should store the passed options" do
-        subject.class.stub!(:post).and_return(fake_token_response)
+        subject.class.stub(:post).and_return(fake_token_response)
         subject.exchange_token(:refresh_token => 'refresh')
         subject.refresh_token.should == 'ref'
       end
 
       it "should call authorize endpoint to exchange token and store them when refresh token is passed" do
-        subject.class.stub!(:post)
+        subject.class.stub(:post)
         Soundcloud.should_receive(:post).with('https://api.soundcloud.com/oauth2/token', :query => {
           :grant_type     => 'refresh_token',
           :refresh_token  => 'refresh',
@@ -228,7 +226,7 @@ describe Soundcloud do
       end
 
       it "should call the on_exchange_token callback if it refreshes a token" do
-        subject.class.stub!(:post).and_return(fake_token_response)
+        subject.class.stub(:post).and_return(fake_token_response)
         called = false
         subject.on_exchange_token { |soundcloud| soundcloud.should == subject; called = true }
         subject.exchange_token(:username => 'foo@bar.com', :password => 'pass')
@@ -236,7 +234,7 @@ describe Soundcloud do
       end
 
       it "should set expires_at based on expire_in response" do
-        subject.class.stub!(:post).and_return(fake_token_response)
+        subject.class.stub(:post).and_return(fake_token_response)
         subject.exchange_token(:username => 'foo@bar.com', :password => 'pass')
         subject.expires_at.to_i.should == (Time.now + 3600).to_i
       end
