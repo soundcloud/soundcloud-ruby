@@ -6,7 +6,7 @@ describe Soundcloud::ArrayResponseWrapper do
       Soundcloud::ArrayResponseWrapper.new([{:foo => 'bar'}]).first.foo.should == 'bar'
     end
   end
-  
+
   describe '#response' do
     it "should return the original response object" do
       Soundcloud::ArrayResponseWrapper.new([{:foo => 'bar'}]).response.should == [{:foo => 'bar'}]

@@ -23,7 +23,7 @@ It provides simple methods to handle authorization and to execute HTTP calls.
     tracks.each do |track|
       puts track.permalink_url
     end
-  
+
 #### OAuth2 user credentials flow and print the username of the authenticated user
     # register a new client, which will exchange the username, password for an access_token
     # NOTE: the SoundCloud API Docs advise not to use the user credentials flow in a web app.
@@ -34,7 +34,7 @@ It provides simple methods to handle authorization and to execute HTTP calls.
       :username       => 'some@email.com',
       :password       => 'userpass'
     })
-    
+
     # print logged in username
     puts client.get('/me').username
 
@@ -44,7 +44,7 @@ It provides simple methods to handle authorization and to execute HTTP calls.
       :client_secret  => YOUR_CLIENT_SECRET,
       :redirect_uri  => YOUR_REDIRECT_URI,
     })
-    
+
     redirect client.authorize_url()
     # the user should be redirected to "https://soundcloud.com/connect?client_id=YOUR_CLIENT_ID&response_type=code&redirect_uri=YOUR_REDIRECT_URI"
     # after granting access he will be redirected back to YOUR_REDIRECT_URI
@@ -58,30 +58,30 @@ It provides simple methods to handle authorization and to execute HTTP calls.
       :client_secret  => YOUR_CLIENT_SECRET,
       :refresh_token  => SOME_REFRESH_TOKEN
     })
-    
+
     # upload a new track with track.mp3 as audio and image.jpg as artwork
     track = client.post('/tracks', :track => {
       :title        => 'a new track',
       :asset_data   => File.new('audio.mp3')
     })
-    
+
     # print new tracks link
     puts track.permalink_url
 
 #### Resolve a track url and print its id
      # register the client
      client = Soundcloud.new(:client_id => YOUR_CLIENT_ID)
-     
+
      # call the resolve endpoint with a track url
      track = client.get('/resolve', :url => "http://soundcloud.com/forss/flickermood")
-     
+
      # print the track id
      puts track.id
 
 #### Register a client for http://sandbox-soundcloud.com with an existing access_token and start following a user
     # register a client for http://sandbox-soundcloud.com with existing access_token
     client = Soundcloud.new(:site => 'sandbox-soundcloud.com', :access_token => SOME_ACCESS_TOKEN)
-    
+
     # create a new following
     user_id_to_follow = 123
     client.put("/me/followings/#{user_id_to_follow}")
@@ -89,31 +89,31 @@ It provides simple methods to handle authorization and to execute HTTP calls.
 ### Initializing a client with an access token and updating the users profile description
     # initializing a client with an access token
     client = Soundcloud.new(:access_token => SOME_ACCESS_TOKEN)
-    
+
     # updating the users profile description
     client.put("/me", :user => {:description => "a new description"})
 
 
-### Add a track to a playlist / set 
+### Add a track to a playlist / set
     client = Soundcloud.new(:access_token => "A_VALID_TOKEN")
-    
+
     # get my last playlist
     playlist = client.get("/me/playlists").first
-    
+
     # get ids of contained tracks
-    track_ids = playlist.tracks.map(&:id) # => [22448500, 21928809] 
-    
+    track_ids = playlist.tracks.map(&:id) # => [22448500, 21928809]
+
     # adding a new track 21778201
     track_ids << 21778201 # => [22448500, 21928809, 21778201]
-    
+
     # map array of ids to array of track objects:
     tracks = track_ids.map { |id| {:id => id} } # => [{:id=>22448500}, {:id=>21928809}, {:id=>21778201}]
-    
+
     # send update/put request to playlist
     playlist = client.put(playlist.uri, :playlist => {
       :tracks => tracks
     })
-    
+
     # print the list of track ids of the updated playlist:
     p playlist.tracks.map(&:id)
 
