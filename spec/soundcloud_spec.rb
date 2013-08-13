@@ -96,49 +96,48 @@ describe Soundcloud do
           expect(WebMock.last_request.headers["User-Agent"]).to eq("SoundCloud Ruby Wrapper #{Soundcloud::VERSION}")
         end
       end
+    end
 
-      [:post, :put].each do |method|
-        describe "##{method}" do
-          it "accepts urls as path and rewrite them" do
-            expect(Soundcloud).to receive(method).with('http://api.soundcloud.com/tracks/123', {:body => {:format => "json", :client_id => 'client'}})
-            subject.send(method, 'http://api.soundcloud.com/tracks/123')
-          end
+    [:post, :put].each do |method|
+      describe "##{method}" do
+        it "accepts urls as path and rewrite them" do
+          expect(Soundcloud).to receive(method).with('http://api.soundcloud.com/tracks/123', {:body => {:format => "json", :client_id => 'client'}})
+          subject.send(method, 'http://api.soundcloud.com/tracks/123')
+        end
 
-          it "preserves query string in path" do
-            stub_request(method, "http://api.soundcloud.com/tracks").
-              with(:query => {:created_with_app_id => "124"}).
-              to_return(:body => '[{"title": "bla"}]', :headers => {:content_type => "application/json"})
-            expect(subject.send(method, '/tracks?created_with_app_id=124')).to be_an_instance_of Soundcloud::ArrayResponseWrapper
-          end
+        it "preserves query string in path" do
+          stub_request(method, "http://api.soundcloud.com/tracks").
+            with(:query => {:created_with_app_id => "124"}).
+            to_return(:body => '[{"title": "bla"}]', :headers => {:content_type => "application/json"})
+          expect(subject.send(method, '/tracks?created_with_app_id=124')).to be_an_instance_of Soundcloud::ArrayResponseWrapper
+        end
 
-          it "passes the client_id as client_id (LEGACY) to .#{method}" do
-            # TODO fix when api is ready for client_id
-            expect(Soundcloud).to receive(method).with('http://api.soundcloud.com/tracks', {:body => {:limit => 2, :format => "json", :client_id => 'client'}})
-            subject.send(method, '/tracks', :limit => 2)
-          end
+        it "passes the client_id as client_id (LEGACY) to .#{method}" do
+          # TODO fix when api is ready for client_id
+          expect(Soundcloud).to receive(method).with('http://api.soundcloud.com/tracks', {:body => {:limit => 2, :format => "json", :client_id => 'client'}})
+          subject.send(method, '/tracks', :limit => 2)
+        end
 
-          it "wraps the response object in a Response" do
-            stub_request(method, "http://api.soundcloud.com/tracks/123").
-              to_return(:body => '{"title": "bla"}', :headers => {:content_type => "application/json"})
-            expect(subject.send(method, '/tracks/123')).to be_an_instance_of Soundcloud::HashResponseWrapper
-          end
+        it "wraps the response object in a Response" do
+          stub_request(method, "http://api.soundcloud.com/tracks/123").
+            to_return(:body => '{"title": "bla"}', :headers => {:content_type => "application/json"})
+          expect(subject.send(method, '/tracks/123')).to be_an_instance_of Soundcloud::HashResponseWrapper
+        end
 
-          it "wraps the response array in an array of ResponseMash" do
-            stub_request(method, "http://api.soundcloud.com/tracks").
-              to_return(:body => '[{"title": "bla"}]', :headers => {:content_type => "application/json"})
-            expect(subject.send(method, '/tracks')).to be_an_instance_of Soundcloud::ArrayResponseWrapper
-          end
+        it "wraps the response array in an array of ResponseMash" do
+          stub_request(method, "http://api.soundcloud.com/tracks").
+            to_return(:body => '[{"title": "bla"}]', :headers => {:content_type => "application/json"})
+          expect(subject.send(method, '/tracks')).to be_an_instance_of Soundcloud::ArrayResponseWrapper
+        end
 
-          it "raises an error if request not successful" do
-            stub_request(method, "http://api.soundcloud.com/tracks").
-              to_return(:status => 402)
-            expect do
-              subject.send(method, '/tracks')
-            end.to raise_error(Soundcloud::ResponseError)
-          end
+        it "raises an error if request not successful" do
+          stub_request(method, "http://api.soundcloud.com/tracks").
+            to_return(:status => 402)
+          expect do
+            subject.send(method, '/tracks')
+          end.to raise_error(Soundcloud::ResponseError)
         end
       end
-
     end
 
     describe "#authorize_url" do
