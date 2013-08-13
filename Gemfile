@@ -1,10 +1,10 @@
 source 'http://rubygems.org'
 
-gem 'rake'
+gem 'rake', '>= 10.1'
 
 group :test do
-  gem 'fakeweb'
-  gem 'rspec'
+  gem 'rspec', '>= 2.14'
+  gem 'webmock', '>= 1.13'
 end
 
 gemspec
