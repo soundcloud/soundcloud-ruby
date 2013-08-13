@@ -4,11 +4,9 @@ The Soundcloud gem is a thin wrapper for the Soundcloud API based off of the htt
 It provides simple methods to handle authorization and to execute HTTP calls.
 
 ## Requirements
+* hashie
 * httmultiparty
 * httparty
-* crack
-* multipart-upload
-* hashie
 
 ## Installation
     gem install soundcloud
