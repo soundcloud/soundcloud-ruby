@@ -1,4 +1,4 @@
-class Soundcloud
+module SoundCloud
   class ResponseError < HTTParty::ResponseError
     STATUS_CODES = {
       400 => "Bad Request",

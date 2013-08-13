@@ -3,12 +3,12 @@ require 'helper'
 describe Soundcloud do
   it "raises ArgumentError when initialized with no options" do
     expect do
-      Soundcloud.new
+      SoundCloud.new
     end.to raise_error(ArgumentError)
   end
 
   context 'initialized with a client id' do
-    subject { Soundcloud.new(:client_id => 'client') }
+    subject{SoundCloud.new(:client_id => 'client')}
 
     describe "#client_id" do
       it "returns the initialized value" do
@@ -49,7 +49,7 @@ describe Soundcloud do
     [:get, :delete, :head].each do |method|
       describe "##{method}" do
         it "accepts urls as path and rewrite them" do
-          expect(Soundcloud).to receive(method).with('http://api.soundcloud.com/tracks/123', {:query => {:format => "json", :client_id => 'client'}})
+          expect(SoundCloud::Client).to receive(method).with('http://api.soundcloud.com/tracks/123', {:query => {:format => "json", :client_id => 'client'}})
           subject.send(method, 'http://api.soundcloud.com/tracks/123')
         end
 
@@ -61,7 +61,7 @@ describe Soundcloud do
         end
 
         it "passes the client_id as client_id (LEGACY) to .#{method}" do
-          expect(Soundcloud).to receive(method).with('http://api.soundcloud.com/tracks', {:query => {:client_id => 'client', :limit => 2, :format => "json"}})
+          expect(SoundCloud::Client).to receive(method).with('http://api.soundcloud.com/tracks', {:query => {:client_id => 'client', :limit => 2, :format => "json"}})
           subject.send(method, '/tracks', :limit => 2)
         end
 
@@ -100,7 +100,7 @@ describe Soundcloud do
     [:post, :put].each do |method|
       describe "##{method}" do
         it "accepts urls as path and rewrite them" do
-          expect(Soundcloud).to receive(method).with('http://api.soundcloud.com/tracks/123', {:body => {:format => "json", :client_id => 'client'}})
+          expect(SoundCloud::Client).to receive(method).with('http://api.soundcloud.com/tracks/123', {:body => {:format => "json", :client_id => 'client'}})
           subject.send(method, 'http://api.soundcloud.com/tracks/123')
         end
 
@@ -112,7 +112,7 @@ describe Soundcloud do
         end
 
         it "passes the client_id as client_id (LEGACY) to .#{method}" do
-          expect(Soundcloud).to receive(method).with('http://api.soundcloud.com/tracks', {:body => {:limit => 2, :format => "json", :client_id => 'client'}})
+          expect(SoundCloud::Client).to receive(method).with('http://api.soundcloud.com/tracks', {:body => {:limit => 2, :format => "json", :client_id => 'client'}})
           subject.send(method, '/tracks', :limit => 2)
         end
 
@@ -198,12 +198,12 @@ describe Soundcloud do
 
 
     context "when initialized with client_id, client_secret" do
-      let(:fake_token_response) { {'access_token' => 'ac', 'expires_in' => 3600, 'scope' => "*", 'refresh_token' => 'ref'} }
+      let(:fake_token_response){{'access_token' => 'ac', 'expires_in' => 3600, 'scope' => "*", 'refresh_token' => 'ref'}}
       before do
         fake_token_response.stub(:success?).and_return(true)
       end
 
-      subject { Soundcloud.new(:client_id => 'client', :client_secret => 'secret') }
+      subject{Soundcloud.new(:client_id => 'client', :client_secret => 'secret')}
 
       it "stores the passed options" do
         subject.class.stub(:post).and_return(fake_token_response)
@@ -213,11 +213,11 @@ describe Soundcloud do
 
       it "calls authorize endpoint to exchange token and store them when refresh token is passed" do
         subject.class.stub(:post)
-        expect(Soundcloud).to receive(:post).with('https://api.soundcloud.com/oauth2/token', :query => {
-          :grant_type     => 'refresh_token',
-          :refresh_token  => 'refresh',
-          :client_id      => 'client',
-          :client_secret  => 'secret'
+        expect(SoundCloud::Client).to receive(:post).with('https://api.soundcloud.com/oauth2/token', :query => {
+          :grant_type    => 'refresh_token',
+          :refresh_token => 'refresh',
+          :client_id     => 'client',
+          :client_secret => 'secret'
         }).and_return(fake_token_response)
         subject.exchange_token(:refresh_token => 'refresh')
         expect(subject.access_token).to eq('ac')
@@ -225,12 +225,12 @@ describe Soundcloud do
       end
 
       it "calls authorize endpoint to exchange token and store them when credentials are passed" do
-        expect(Soundcloud).to receive(:post).with('https://api.soundcloud.com/oauth2/token', :query => {
-          :grant_type     => 'password',
-          :username       => 'foo@bar.com',
-          :password       => 'pass',
-          :client_id      => 'client',
-          :client_secret  => 'secret',
+        expect(SoundCloud::Client).to receive(:post).with('https://api.soundcloud.com/oauth2/token', :query => {
+          :grant_type    => 'password',
+          :username      => 'foo@bar.com',
+          :password      => 'pass',
+          :client_id     => 'client',
+          :client_secret => 'secret',
         }).and_return(fake_token_response)
         subject.exchange_token(:username => 'foo@bar.com', :password => 'pass')
         expect(subject.access_token).to eq('ac')
@@ -239,13 +239,13 @@ describe Soundcloud do
 
       it "calls authorize endpoint to exchange token and store them when code and redirect_uri are passed" do
         expect(subject.class).to receive(:post).with('https://api.soundcloud.com/oauth2/token', :query => {
-          :grant_type     => 'authorization_code',
-          :redirect_uri   => 'http://somewhere.com/bla',
-          :code       => 'pass',
-          :client_id      => 'client',
-          :client_secret  => 'secret',
+          :grant_type    => 'authorization_code',
+          :redirect_uri  => 'http://somewhere.com/bla',
+          :code          => 'pass',
+          :client_id     => 'client',
+          :client_secret => 'secret',
         }).and_return(fake_token_response)
-        subject.exchange_token(:redirect_uri   => 'http://somewhere.com/bla', :code => 'pass')
+        subject.exchange_token(:redirect_uri => 'http://somewhere.com/bla', :code => 'pass')
         expect(subject.access_token).to eq('ac')
         expect(subject.refresh_token).to eq('ref')
       end
@@ -253,7 +253,7 @@ describe Soundcloud do
       it "calls the on_exchange_token callback if it refreshes a token" do
         subject.class.stub(:post).and_return(fake_token_response)
         called = false
-        subject.on_exchange_token { |soundcloud| expect(soundcloud).to eq(subject); called = true }
+        subject.on_exchange_token{|soundcloud| expect(soundcloud).to eq(subject); called = true}
         subject.exchange_token(:username => 'foo@bar.com', :password => 'pass')
         expect(called).to be_true
       end
@@ -267,7 +267,7 @@ describe Soundcloud do
   end
 
   context 'initialized with access_token' do
-    subject { Soundcloud.new(:access_token => 'ac', :client_id => 'client', :client_secret => 'sect') }
+    subject{Soundcloud.new(:access_token => 'ac', :client_id => 'client', :client_secret => 'sect')}
 
     describe "#get" do
       it "raises InvalidAccessTokenException when access token is invalid" do
@@ -281,7 +281,7 @@ describe Soundcloud do
   end
 
   context 'initialized with access_token, refresh_token' do
-    subject { Soundcloud.new(:access_token => 'ac', :refresh_token => 'ce', :client_id => 'client', :client_secret => 'sect') }
+    subject{Soundcloud.new(:access_token => 'ac', :refresh_token => 'ce', :client_id => 'client', :client_secret => 'sect')}
 
     describe "#access_token" do
       it "returns the initialized value" do
@@ -298,7 +298,7 @@ describe Soundcloud do
     [:get, :head, :delete].each do |method|
       describe "##{method}" do
         it "passes the oauth_token parameter when doing a request" do
-          expect(Soundcloud).to receive(method).with('https://api.soundcloud.com/tracks', {:query => {:format => "json", :oauth_token => 'ac'}})
+          expect(SoundCloud::Client).to receive(method).with('https://api.soundcloud.com/tracks', {:query => {:format => "json", :oauth_token => 'ac'}})
           subject.send(method, '/tracks')
         end
         it "tries to refresh the token if it is expired and retry" do
@@ -314,7 +314,7 @@ describe Soundcloud do
           expect do
             response = subject.send(method, '/tracks/1')
             expect(response.title).to eq('test')
-          end.to change { subject.access_token }.to('new_access_token')
+          end.to change{subject.access_token}.to('new_access_token')
         end
       end
     end

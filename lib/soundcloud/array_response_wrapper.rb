@@ -1,4 +1,4 @@
-class Soundcloud
+module SoundCloud
   class ArrayResponseWrapper < Array
     attr_reader :response
     def initialize(response=[])

@@ -1,12 +1,11 @@
-# -*- encoding: utf-8 -*-
+# coding: utf-8
 lib = File.expand_path('../lib/', __FILE__)
 $:.unshift lib unless $:.include?(lib)
-
 require 'soundcloud/version'
 
 Gem::Specification.new do |spec|
   spec.name        = 'soundcloud'
-  spec.version     = Soundcloud::VERSION
+  spec.version     = SoundCloud::VERSION
   spec.platform    = Gem::Platform::RUBY
   spec.authors     = ["Johannes Wagener"]
   spec.email       = ["johannes@soundcloud.com"]

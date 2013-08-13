@@ -96,7 +96,7 @@ It provides simple methods to handle authorization and to execute HTTP calls.
     track_ids << 21778201 # => [22448500, 21928809, 21778201]
 
     # map array of ids to array of track objects:
-    tracks = track_ids.map { |id| {:id => id} } # => [{:id=>22448500}, {:id=>21928809}, {:id=>21778201}]
+    tracks = track_ids.map{|id| {:id => id}} # => [{:id=>22448500}, {:id=>21928809}, {:id=>21778201}]
 
     # send update/put request to playlist
     playlist = client.put(playlist.uri, :playlist => {
