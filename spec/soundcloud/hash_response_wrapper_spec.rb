@@ -1,9 +1,9 @@
 require 'helper'
 
-describe Soundcloud::HashResponseWrapper do
+describe SoundCloud::HashResponseWrapper do
 
   before do
-    @hash_response_wrapper = Soundcloud::HashResponseWrapper.new({:foo => 'bar'})
+    @hash_response_wrapper = SoundCloud::HashResponseWrapper.new({:foo => 'bar'})
   end
 
   describe '.new' do

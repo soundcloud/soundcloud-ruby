@@ -1,6 +1,6 @@
 require 'helper'
 
-describe Soundcloud do
+describe SoundCloud do
   it "raises ArgumentError when initialized with no options" do
     expect do
       SoundCloud.new
@@ -57,7 +57,7 @@ describe Soundcloud do
           stub_request(method, "http://api.soundcloud.com/tracks").
             with(:query => {:client_id => "client", :created_with_app_id => "124", :format => "json"}).
             to_return(:body => '[{"title": "bla"}]', :headers => {:content_type => "application/json"})
-          expect(subject.send(method, '/tracks?created_with_app_id=124')).to be_an_instance_of Soundcloud::ArrayResponseWrapper
+          expect(subject.send(method, '/tracks?created_with_app_id=124')).to be_an_instance_of SoundCloud::ArrayResponseWrapper
         end
 
         it "passes the client_id as client_id (LEGACY) to .#{method}" do
@@ -69,14 +69,14 @@ describe Soundcloud do
           stub_request(method, "http://api.soundcloud.com/tracks/123").
             with(:query => {:format => "json", :client_id => "client"}).
             to_return(:body => '{"title": "bla"}', :headers => {:content_type => "application/json"})
-          expect(subject.send(method, '/tracks/123')).to be_an_instance_of Soundcloud::HashResponseWrapper
+          expect(subject.send(method, '/tracks/123')).to be_an_instance_of SoundCloud::HashResponseWrapper
         end
 
         it "wraps the response array in an array of ResponseMash" do
           stub_request(method, "http://api.soundcloud.com/tracks").
             with(:query => {:format => "json", :client_id => "client"}).
             to_return(:body => '[{"title": "bla"}]', :headers => {:content_type => "application/json"})
-          expect(subject.send(method, '/tracks')).to be_an_instance_of Soundcloud::ArrayResponseWrapper
+          expect(subject.send(method, '/tracks')).to be_an_instance_of SoundCloud::ArrayResponseWrapper
         end
 
         it "raises an error if request not successful" do
@@ -85,14 +85,14 @@ describe Soundcloud do
             to_return(:status => 402, :body => "{'error': 'you need to pay'}")
           expect do
             subject.send(method, '/tracks')
-          end.to raise_error(Soundcloud::ResponseError)
+          end.to raise_error(SoundCloud::ResponseError)
         end
 
         it "sends a user agent header" do
           stub_request(method, "http://api.soundcloud.com/tracks").
             with(:query => {:format => "json", :client_id => "client"})
           subject.send(method, '/tracks')
-          expect(WebMock.last_request.headers["User-Agent"]).to eq("SoundCloud Ruby Wrapper #{Soundcloud::VERSION}")
+          expect(WebMock.last_request.headers["User-Agent"]).to eq("SoundCloud Ruby Wrapper #{SoundCloud::VERSION}")
         end
       end
     end
@@ -108,7 +108,7 @@ describe Soundcloud do
           stub_request(method, "http://api.soundcloud.com/tracks").
             with(:query => {:created_with_app_id => "124"}).
             to_return(:body => '[{"title": "bla"}]', :headers => {:content_type => "application/json"})
-          expect(subject.send(method, '/tracks?created_with_app_id=124')).to be_an_instance_of Soundcloud::ArrayResponseWrapper
+          expect(subject.send(method, '/tracks?created_with_app_id=124')).to be_an_instance_of SoundCloud::ArrayResponseWrapper
         end
 
         it "passes the client_id as client_id (LEGACY) to .#{method}" do
@@ -119,13 +119,13 @@ describe Soundcloud do
         it "wraps the response object in a Response" do
           stub_request(method, "http://api.soundcloud.com/tracks/123").
             to_return(:body => '{"title": "bla"}', :headers => {:content_type => "application/json"})
-          expect(subject.send(method, '/tracks/123')).to be_an_instance_of Soundcloud::HashResponseWrapper
+          expect(subject.send(method, '/tracks/123')).to be_an_instance_of SoundCloud::HashResponseWrapper
         end
 
         it "wraps the response array in an array of ResponseMash" do
           stub_request(method, "http://api.soundcloud.com/tracks").
             to_return(:body => '[{"title": "bla"}]', :headers => {:content_type => "application/json"})
-          expect(subject.send(method, '/tracks')).to be_an_instance_of Soundcloud::ArrayResponseWrapper
+          expect(subject.send(method, '/tracks')).to be_an_instance_of SoundCloud::ArrayResponseWrapper
         end
 
         it "raises an error if request not successful" do
@@ -133,7 +133,7 @@ describe Soundcloud do
             to_return(:status => 402)
           expect do
             subject.send(method, '/tracks')
-          end.to raise_error(Soundcloud::ResponseError)
+          end.to raise_error(SoundCloud::ResponseError)
         end
       end
     end
@@ -183,7 +183,7 @@ describe Soundcloud do
   describe "#exchange_token" do
     it "raises an argument error if client_secret no present" do
       expect do
-        Soundcloud.new(:client_id => 'x').exchange_token(:refresh_token => 'as')
+        SoundCloud.new(:client_id => 'x').exchange_token(:refresh_token => 'as')
       end.to raise_error(ArgumentError)
     end
 
@@ -192,8 +192,8 @@ describe Soundcloud do
         stub_request(:post, "https://api.soundcloud.com/oauth2/token").
           with(:body => {:grant_type => "refresh_token", :refresh_token => "as", :client_id => "x", :client_secret => "bang"}).
           to_return(:status => 401, :body => '{error: "invalid_client"}', :headers => {:content_type => "application/json"})
-        Soundcloud.new(:client_id => 'x', :client_secret => 'bang').exchange_token(:refresh_token => 'as')
-      end.to raise_error(Soundcloud::ResponseError)
+        SoundCloud.new(:client_id => 'x', :client_secret => 'bang').exchange_token(:refresh_token => 'as')
+      end.to raise_error(SoundCloud::ResponseError)
     end
 
 
@@ -203,7 +203,7 @@ describe Soundcloud do
         fake_token_response.stub(:success?).and_return(true)
       end
 
-      subject{Soundcloud.new(:client_id => 'client', :client_secret => 'secret')}
+      subject{SoundCloud.new(:client_id => 'client', :client_secret => 'secret')}
 
       it "stores the passed options" do
         subject.class.stub(:post).and_return(fake_token_response)
@@ -267,7 +267,7 @@ describe Soundcloud do
   end
 
   context 'initialized with access_token' do
-    subject{Soundcloud.new(:access_token => 'ac', :client_id => 'client', :client_secret => 'sect')}
+    subject{SoundCloud.new(:access_token => 'ac', :client_id => 'client', :client_secret => 'sect')}
 
     describe "#get" do
       it "raises InvalidAccessTokenException when access token is invalid" do
@@ -275,13 +275,13 @@ describe Soundcloud do
           to_return(:status => 401)
         expect do
           subject.send(:get, '/me')
-        end.to raise_error(Soundcloud::ResponseError)
+        end.to raise_error(SoundCloud::ResponseError)
       end
     end
   end
 
   context 'initialized with access_token, refresh_token' do
-    subject{Soundcloud.new(:access_token => 'ac', :refresh_token => 'ce', :client_id => 'client', :client_secret => 'sect')}
+    subject{SoundCloud.new(:access_token => 'ac', :refresh_token => 'ce', :client_id => 'client', :client_secret => 'sect')}
 
     describe "#access_token" do
       it "returns the initialized value" do

@@ -10,8 +10,8 @@ Gem::Specification.new do |spec|
   spec.authors     = ["Johannes Wagener"]
   spec.email       = ["johannes@soundcloud.com"]
   spec.homepage    = 'http://dev.soundcloud.com'
-  spec.summary     = "A simple Soundcloud API wrapper"
-  spec.description = spec.summary
+  spec.summary     = "The official SoundCloud API wrapper."
+  spec.description = "The official SoundCloud API wrapper. It provides simple methods to handle authorization and to execute HTTP calls."
 
   spec.required_rubygems_version = '>= 1.3.5'
 

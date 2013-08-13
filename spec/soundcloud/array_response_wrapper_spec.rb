@@ -1,9 +1,9 @@
 require 'helper'
 
-describe Soundcloud::ArrayResponseWrapper do
+describe SoundCloud::ArrayResponseWrapper do
 
   before do
-    @array_response_wrapper = Soundcloud::ArrayResponseWrapper.new([{:foo => 'bar'}])
+    @array_response_wrapper = SoundCloud::ArrayResponseWrapper.new([{:foo => 'bar'}])
   end
 
   describe '.new' do
