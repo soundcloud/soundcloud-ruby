@@ -153,15 +153,15 @@ through `HashResponseWrapper#response`.
 #### SoundCloud#client_id, client_secret, access_token, refresh_token, use_ssl?
 These methods are accessors for the stored options.
 
-### SoundCloud#on_exchange_token
+#### SoundCloud#on_exchange_token
 A Proc passed to on_exchange_token will be called each time a token was
 successfully exchanged or refreshed
 
-### SoundCloud#expires_at
+#### SoundCloud#expires_at
 Returns a date based on the `expires_in` attribute returned from a token
 exchange.
 
-### SoundCloud#expired?
+#### SoundCloud#expired?
 Will return true or false depending on if `expires_at` is in the past.
 
 #### Error Handling
