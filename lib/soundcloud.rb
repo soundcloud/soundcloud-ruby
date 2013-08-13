@@ -38,13 +38,13 @@ class Soundcloud
 
   def post(path, body={},  options={})
     handle_response {
-      self.class.post(*construct_query_arguments(path, options.merge(:body  => body), :body))
+      self.class.post(*construct_query_arguments(path, options.merge(:body => body), :body))
     }
   end
 
   def put(path, body={},  options={})
     handle_response {
-      self.class.put(*construct_query_arguments(path, options.merge(:body  => body), :body))
+      self.class.put(*construct_query_arguments(path, options.merge(:body => body), :body))
     }
   end
 
@@ -116,11 +116,22 @@ class Soundcloud
     raise ArgumentError, 'client_id and client_secret is required to retrieve an access_token' if client_id.nil? || client_secret.nil?
     client_params = {:client_id => client_id, :client_secret => client_secret}
     params = if options_for_refresh_flow_present?
-      {:grant_type => 'refresh_token',      :refresh_token => refresh_token}
+      {
+        :grant_type => 'refresh_token',
+        :refresh_token => refresh_token,
+      }
     elsif options_for_credentials_flow_present?
-      {:grant_type => 'password',           :username      => @options[:username],     :password => @options[:password]}
+      {
+        :grant_type => 'password',
+        :username => @options[:username],
+        :password => @options[:password],
+      }
     elsif options_for_code_flow_present?
-      {:grant_type => 'authorization_code', :redirect_uri  => @options[:redirect_uri], :code => @options[:code]}
+      {
+        :grant_type => 'authorization_code',
+        :redirect_uri => @options[:redirect_uri],
+        :code => @options[:code],
+      }
     end
     params.merge!(client_params)
     response = handle_response(false) {
@@ -171,7 +182,7 @@ private
 
   def store_options(options={})
     @options ||= DEFAULT_OPTIONS.dup
-    @options.merge! options
+    @options.merge!(options)
   end
 
   def construct_query_arguments(path_or_uri, options={}, body_or_query=:query)

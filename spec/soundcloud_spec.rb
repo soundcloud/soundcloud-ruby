@@ -61,7 +61,6 @@ describe Soundcloud do
         end
 
         it "passes the client_id as client_id (LEGACY) to .#{method}" do
-          # TODO fix when api is ready for client_id
           expect(Soundcloud).to receive(method).with('http://api.soundcloud.com/tracks', {:query => {:client_id => 'client', :limit => 2, :format => "json"}})
           subject.send(method, '/tracks', :limit => 2)
         end
@@ -113,7 +112,6 @@ describe Soundcloud do
         end
 
         it "passes the client_id as client_id (LEGACY) to .#{method}" do
-          # TODO fix when api is ready for client_id
           expect(Soundcloud).to receive(method).with('http://api.soundcloud.com/tracks', {:body => {:limit => 2, :format => "json", :client_id => 'client'}})
           subject.send(method, '/tracks', :limit => 2)
         end
