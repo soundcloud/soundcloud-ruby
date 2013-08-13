@@ -1,3 +1,5 @@
+require 'simplecov'
+SimpleCov.start
 require 'soundcloud'
 require 'webmock/rspec'
 
