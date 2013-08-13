@@ -1,15 +1,22 @@
-require File.expand_path(File.join(File.dirname(__FILE__), '../spec_helper'))
+require 'helper'
 
 describe Soundcloud::HashResponseWrapper do
+
+  before do
+    @hash_response_wrapper = Soundcloud::HashResponseWrapper.new({:foo => 'bar'})
+  end
+
   describe '.new' do
-    it "should provide a Mash with accessors for the key/values of the passed response" do
-      Soundcloud::HashResponseWrapper.new({:foo => 'bar'}).foo.should == 'bar'
+    it "provides a Mash with accessors for the key/values of the passed response" do
+      expect(@hash_response_wrapper.foo).to eq('bar')
     end
   end
 
   describe '#response' do
-    it "should return the original response object" do
-      Soundcloud::HashResponseWrapper.new({:foo => 'bar'}).response.should == {:foo => 'bar'}
+    it "returns the original response object" do
+      expect(@hash_response_wrapper.response).to be_a Hash
+      expect(@hash_response_wrapper.response).to eq({:foo => 'bar'})
     end
   end
+
 end

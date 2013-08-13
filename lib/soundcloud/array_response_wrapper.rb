@@ -2,9 +2,11 @@ class Soundcloud
   class ArrayResponseWrapper < Array
     attr_reader :response
     def initialize(response=[])
-      mashes = response.map { |o| Hashie::Mash.new(o) }
-      self.replace(mashes)
       @response = response
+      mashes = response.map do |object|
+        Hashie::Mash.new(object)
+      end
+      replace(mashes)
     end
   end
 end

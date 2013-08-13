@@ -1,184 +1,202 @@
-require File.expand_path(File.join(File.dirname(__FILE__), 'spec_helper'))
+require 'helper'
 
 describe Soundcloud do
-  it "should raise ArgumentError when initialized with no options" do
-    lambda do
+  it "raises ArgumentError when initialized with no options" do
+    expect do
       Soundcloud.new
-    end.should raise_error(ArgumentError)
+    end.to raise_error(ArgumentError)
   end
 
   context 'initialized with a client id' do
     subject { Soundcloud.new(:client_id => 'client') }
-    its(:options)   { should include :client_id }
-    its(:client_id) { should == 'client' }
-    its(:use_ssl?)  { should be_false }
-    its(:site)      { should == 'soundcloud.com' }
-    its(:host)      { should == 'soundcloud.com' }
-    its(:api_host)  { should == 'api.soundcloud.com' }
+
+    describe "#client_id" do
+      it "returns the initialized value" do
+        expect(subject.client_id).to eq("client")
+      end
+    end
+
+    describe "#options" do
+      it "includes client_id" do
+        expect(subject.options).to include(:client_id)
+      end
+    end
+
+    describe "#use_ssl?" do
+      it "is false" do
+        expect(subject.use_ssl?).to be_false
+      end
+    end
+
+    describe "#site" do
+      it "is soundcloud.com" do
+        expect(subject.site).to eq("soundcloud.com")
+      end
+    end
+
+    describe "#host" do
+      it "is soundcloud.com" do
+        expect(subject.host).to eq("soundcloud.com")
+      end
+    end
+
+    describe "#api_host" do
+      it "is api.soundcloud.com" do
+        expect(subject.api_host).to eq("api.soundcloud.com")
+      end
+    end
 
     [:get, :delete, :head].each do |method|
       describe "##{method}" do
-        it "should accept urls as path and rewrite them" do
-          Soundcloud.should_receive(method).with('http://api.soundcloud.com/tracks/123', {:query => {:format => "json", :client_id => 'client'}})
+        it "accepts urls as path and rewrite them" do
+          expect(Soundcloud).to receive(method).with('http://api.soundcloud.com/tracks/123', {:query => {:format => "json", :client_id => 'client'}})
           subject.send(method, 'http://api.soundcloud.com/tracks/123')
         end
 
-        it "should preserve query string in path" do
+        it "preserves query string in path" do
           stub_request(method, "http://api.soundcloud.com/tracks").
             with(:query => {:client_id => "client", :created_with_app_id => "124", :format => "json"}).
             to_return(:body => '[{"title": "bla"}]', :headers => {:content_type => "application/json"})
-          subject.send(method, '/tracks?created_with_app_id=124').should be_an_instance_of Soundcloud::ArrayResponseWrapper
+          expect(subject.send(method, '/tracks?created_with_app_id=124')).to be_an_instance_of Soundcloud::ArrayResponseWrapper
         end
 
-        it "should pass the client_id as client_id (LEGACY) to .#{method}" do
+        it "passes the client_id as client_id (LEGACY) to .#{method}" do
           # TODO fix when api is ready for client_id
-          Soundcloud.should_receive(method).with('http://api.soundcloud.com/tracks', {:query => {:client_id => 'client', :limit => 2, :format => "json"}})
+          expect(Soundcloud).to receive(method).with('http://api.soundcloud.com/tracks', {:query => {:client_id => 'client', :limit => 2, :format => "json"}})
           subject.send(method, '/tracks', :limit => 2)
         end
 
-        it "should wrap the response object in a Response" do
+        it "wraps the response object in a Response" do
           stub_request(method, "http://api.soundcloud.com/tracks/123").
             with(:query => {:format => "json", :client_id => "client"}).
             to_return(:body => '{"title": "bla"}', :headers => {:content_type => "application/json"})
-          subject.send(method, '/tracks/123').should be_an_instance_of Soundcloud::HashResponseWrapper
+          expect(subject.send(method, '/tracks/123')).to be_an_instance_of Soundcloud::HashResponseWrapper
         end
 
-        it "should wrap the response array in an array of ResponseMash" do
+        it "wraps the response array in an array of ResponseMash" do
           stub_request(method, "http://api.soundcloud.com/tracks").
             with(:query => {:format => "json", :client_id => "client"}).
             to_return(:body => '[{"title": "bla"}]', :headers => {:content_type => "application/json"})
-          subject.send(method, '/tracks').should be_an_instance_of Soundcloud::ArrayResponseWrapper
+          expect(subject.send(method, '/tracks')).to be_an_instance_of Soundcloud::ArrayResponseWrapper
         end
 
-        it "should raise an error if request not successful" do
+        it "raises an error if request not successful" do
           stub_request(method, "http://api.soundcloud.com/tracks").
             with(:query => {:format => "json", :client_id => "client"}).
             to_return(:status => 402, :body => "{'error': 'you need to pay'}")
-          lambda do
+          expect do
             subject.send(method, '/tracks')
-          end.should raise_error(Soundcloud::ResponseError)
+          end.to raise_error(Soundcloud::ResponseError)
         end
 
-        it "should send a user agent header" do
+        it "sends a user agent header" do
           stub_request(method, "http://api.soundcloud.com/tracks").
             with(:query => {:format => "json", :client_id => "client"})
           subject.send(method, '/tracks')
-          WebMock.last_request.headers["User-Agent"].should == "SoundCloud Ruby Wrapper #{Soundcloud::VERSION}"
+          expect(WebMock.last_request.headers["User-Agent"]).to eq("SoundCloud Ruby Wrapper #{Soundcloud::VERSION}")
         end
       end
 
       [:post, :put].each do |method|
         describe "##{method}" do
-          it "should accept urls as path and rewrite them" do
-            Soundcloud.should_receive(method).with('http://api.soundcloud.com/tracks/123', {:body => {:format => "json", :client_id => 'client'}})
+          it "accepts urls as path and rewrite them" do
+            expect(Soundcloud).to receive(method).with('http://api.soundcloud.com/tracks/123', {:body => {:format => "json", :client_id => 'client'}})
             subject.send(method, 'http://api.soundcloud.com/tracks/123')
           end
 
-          it "should preserve query string in path" do
+          it "preserves query string in path" do
             stub_request(method, "http://api.soundcloud.com/tracks").
               with(:query => {:created_with_app_id => "124"}).
               to_return(:body => '[{"title": "bla"}]', :headers => {:content_type => "application/json"})
-            subject.send(method, '/tracks?created_with_app_id=124').should be_an_instance_of Soundcloud::ArrayResponseWrapper
+            expect(subject.send(method, '/tracks?created_with_app_id=124')).to be_an_instance_of Soundcloud::ArrayResponseWrapper
           end
 
-          it "should pass the client_id as client_id (LEGACY) to .#{method}" do
+          it "passes the client_id as client_id (LEGACY) to .#{method}" do
             # TODO fix when api is ready for client_id
-            Soundcloud.should_receive(method).with('http://api.soundcloud.com/tracks', {:body => {:limit => 2, :format => "json", :client_id => 'client'}})
+            expect(Soundcloud).to receive(method).with('http://api.soundcloud.com/tracks', {:body => {:limit => 2, :format => "json", :client_id => 'client'}})
             subject.send(method, '/tracks', :limit => 2)
           end
 
-          it "should wrap the response object in a Response" do
+          it "wraps the response object in a Response" do
             stub_request(method, "http://api.soundcloud.com/tracks/123").
               to_return(:body => '{"title": "bla"}', :headers => {:content_type => "application/json"})
-            subject.send(method, '/tracks/123').should be_an_instance_of Soundcloud::HashResponseWrapper
+            expect(subject.send(method, '/tracks/123')).to be_an_instance_of Soundcloud::HashResponseWrapper
           end
 
-          it "should wrap the response array in an array of ResponseMash" do
+          it "wraps the response array in an array of ResponseMash" do
             stub_request(method, "http://api.soundcloud.com/tracks").
               to_return(:body => '[{"title": "bla"}]', :headers => {:content_type => "application/json"})
-            subject.send(method, '/tracks').should be_an_instance_of Soundcloud::ArrayResponseWrapper
+            expect(subject.send(method, '/tracks')).to be_an_instance_of Soundcloud::ArrayResponseWrapper
           end
 
-          it "should raise an error if request not successful" do
+          it "raises an error if request not successful" do
             stub_request(method, "http://api.soundcloud.com/tracks").
               to_return(:status => 402)
-            lambda do
+            expect do
               subject.send(method, '/tracks')
-            end.should raise_error(Soundcloud::ResponseError)
+            end.to raise_error(Soundcloud::ResponseError)
           end
         end
       end
 
     end
 
-    context 'and site = soundcloud.com' do
-      subject { Soundcloud.new(:client_id => 'client', :site => 'soundcloud.com') }
-      its(:site)     { should == 'soundcloud.com' }
-      its(:host)     { should == 'soundcloud.com' }
-      its(:api_host) { should == 'api.soundcloud.com' }
-    end
-
     describe "#authorize_url" do
-      it "should generate a authorize_url" do
-        subject.authorize_url(:redirect_uri => "http://come.back.to/me").should ==
-          "https://soundcloud.com/connect?response_type=code_and_token&client_id=client&redirect_uri=http://come.back.to/me&"
+      it "generates a authorize_url" do
+        expect(subject.authorize_url(:redirect_uri => "http://come.back.to/me")).to eq("https://soundcloud.com/connect?response_type=code_and_token&client_id=client&redirect_uri=http://come.back.to/me&")
       end
 
-      it "should generate a authorize_url and include the passed display parameter" do
-        subject.authorize_url(:redirect_uri => "http://come.back.to/me", :display => "popup").should ==
-          "https://soundcloud.com/connect?response_type=code_and_token&client_id=client&redirect_uri=http://come.back.to/me&display=popup"
+      it "generates a authorize_url and include the passed display parameter" do
+        expect(subject.authorize_url(:redirect_uri => "http://come.back.to/me", :display => "popup")).to eq("https://soundcloud.com/connect?response_type=code_and_token&client_id=client&redirect_uri=http://come.back.to/me&display=popup")
       end
 
-      it "should generate a authorize_url and include the passed state parameter" do
-        subject.authorize_url(:redirect_uri => "http://come.back.to/me", :state => "hell&yeah").should ==
-          "https://soundcloud.com/connect?response_type=code_and_token&client_id=client&redirect_uri=http://come.back.to/me&state=hell%26yeah"
+      it "generates a authorize_url and include the passed state parameter" do
+        expect(subject.authorize_url(:redirect_uri => "http://come.back.to/me", :state => "hell&yeah")).to eq("https://soundcloud.com/connect?response_type=code_and_token&client_id=client&redirect_uri=http://come.back.to/me&state=hell%26yeah")
       end
 
-      it "should generate a authorize_url and include the passed scope parameter" do
-        subject.authorize_url(:redirect_uri => "http://come.back.to/me", :scope => "non-expiring").should ==
-          "https://soundcloud.com/connect?response_type=code_and_token&client_id=client&redirect_uri=http://come.back.to/me&scope=non-expiring"
+      it "generates a authorize_url and include the passed scope parameter" do
+        expect(subject.authorize_url(:redirect_uri => "http://come.back.to/me", :scope => "non-expiring")).to eq("https://soundcloud.com/connect?response_type=code_and_token&client_id=client&redirect_uri=http://come.back.to/me&scope=non-expiring")
       end
 
-      it "should generate a authorize_url and include the passed scope and state parameter" do
-        subject.authorize_url(:redirect_uri => "http://come.back.to/me", :scope => "non-expiring", :state => "blub").should ==
-          "https://soundcloud.com/connect?response_type=code_and_token&client_id=client&redirect_uri=http://come.back.to/me&state=blub&scope=non-expiring"
+      it "generates a authorize_url and include the passed scope and state parameter" do
+        expect(subject.authorize_url(:redirect_uri => "http://come.back.to/me", :scope => "non-expiring", :state => "blub")).to eq("https://soundcloud.com/connect?response_type=code_and_token&client_id=client&redirect_uri=http://come.back.to/me&state=blub&scope=non-expiring")
       end
     end
 
     describe "#on_exchange_token" do
-      it "should store the passed block as option" do
-        block = lambda {}
+      it "stores the passed block as option" do
+        block = Proc.new{}
         subject.on_exchange_token(&block)
-        subject.instance_variable_get(:@options)[:on_exchange_token].should == block
+        expect(subject.instance_variable_get(:@options)[:on_exchange_token]).to eq(block)
       end
     end
 
     describe "#expired?" do
-      it "should be true if expires_at is in the past" do
+      it "is true if expires_at is in the past" do
         subject.instance_variable_get(:@options)[:expires_at] = Time.now - 60
-        subject.should be_expired
+        expect(subject).to be_expired
       end
-      it "should be false if expires_at is in the future" do
+      it "is false if expires_at is in the future" do
         subject.instance_variable_get(:@options)[:expires_at] = Time.now + 60
-        subject.should_not be_expired
+        expect(subject).not_to be_expired
       end
     end
   end
 
   describe "#exchange_token" do
-    it "should raise an argument error if client_secret no present" do
-      lambda do
+    it "raises an argument error if client_secret no present" do
+      expect do
         Soundcloud.new(:client_id => 'x').exchange_token(:refresh_token => 'as')
-      end.should raise_error(ArgumentError)
+      end.to raise_error(ArgumentError)
     end
 
-    it "should raise a response error when exchanging token results in 401" do
-      lambda do
+    it "raises a response error when exchanging token results in 401" do
+      expect do
         stub_request(:post, "https://api.soundcloud.com/oauth2/token").
           with(:body => {:grant_type => "refresh_token", :refresh_token => "as", :client_id => "x", :client_secret => "bang"}).
           to_return(:status => 401, :body => '{error: "invalid_client"}', :headers => {:content_type => "application/json"})
         Soundcloud.new(:client_id => 'x', :client_secret => 'bang').exchange_token(:refresh_token => 'as')
-      end.should raise_error(Soundcloud::ResponseError)
+      end.to raise_error(Soundcloud::ResponseError)
     end
 
 
@@ -190,27 +208,27 @@ describe Soundcloud do
 
       subject { Soundcloud.new(:client_id => 'client', :client_secret => 'secret') }
 
-      it "should store the passed options" do
+      it "stores the passed options" do
         subject.class.stub(:post).and_return(fake_token_response)
         subject.exchange_token(:refresh_token => 'refresh')
-        subject.refresh_token.should == 'ref'
+        expect(subject.refresh_token).to eq('ref')
       end
 
-      it "should call authorize endpoint to exchange token and store them when refresh token is passed" do
+      it "calls authorize endpoint to exchange token and store them when refresh token is passed" do
         subject.class.stub(:post)
-        Soundcloud.should_receive(:post).with('https://api.soundcloud.com/oauth2/token', :query => {
+        expect(Soundcloud).to receive(:post).with('https://api.soundcloud.com/oauth2/token', :query => {
           :grant_type     => 'refresh_token',
           :refresh_token  => 'refresh',
           :client_id      => 'client',
           :client_secret  => 'secret'
         }).and_return(fake_token_response)
         subject.exchange_token(:refresh_token => 'refresh')
-        subject.access_token.should  == 'ac'
-        subject.refresh_token.should == 'ref'
+        expect(subject.access_token).to eq('ac')
+        expect(subject.refresh_token).to eq('ref')
       end
 
-      it "should call authorize endpoint to exchange token and store them when credentials are passed" do
-        Soundcloud.should_receive(:post).with('https://api.soundcloud.com/oauth2/token', :query => {
+      it "calls authorize endpoint to exchange token and store them when credentials are passed" do
+        expect(Soundcloud).to receive(:post).with('https://api.soundcloud.com/oauth2/token', :query => {
           :grant_type     => 'password',
           :username       => 'foo@bar.com',
           :password       => 'pass',
@@ -218,12 +236,12 @@ describe Soundcloud do
           :client_secret  => 'secret',
         }).and_return(fake_token_response)
         subject.exchange_token(:username => 'foo@bar.com', :password => 'pass')
-        subject.access_token.should  == 'ac'
-        subject.refresh_token.should == 'ref'
+        expect(subject.access_token).to eq('ac')
+        expect(subject.refresh_token).to eq('ref')
       end
 
-      it "should call authorize endpoint to exchange token and store them when code and redirect_uri are passed" do
-        subject.class.should_receive(:post).with('https://api.soundcloud.com/oauth2/token', :query => {
+      it "calls authorize endpoint to exchange token and store them when code and redirect_uri are passed" do
+        expect(subject.class).to receive(:post).with('https://api.soundcloud.com/oauth2/token', :query => {
           :grant_type     => 'authorization_code',
           :redirect_uri   => 'http://somewhere.com/bla',
           :code       => 'pass',
@@ -231,22 +249,22 @@ describe Soundcloud do
           :client_secret  => 'secret',
         }).and_return(fake_token_response)
         subject.exchange_token(:redirect_uri   => 'http://somewhere.com/bla', :code => 'pass')
-        subject.access_token.should  == 'ac'
-        subject.refresh_token.should == 'ref'
+        expect(subject.access_token).to eq('ac')
+        expect(subject.refresh_token).to eq('ref')
       end
 
-      it "should call the on_exchange_token callback if it refreshes a token" do
+      it "calls the on_exchange_token callback if it refreshes a token" do
         subject.class.stub(:post).and_return(fake_token_response)
         called = false
-        subject.on_exchange_token { |soundcloud| soundcloud.should == subject; called = true }
+        subject.on_exchange_token { |soundcloud| expect(soundcloud).to eq(subject); called = true }
         subject.exchange_token(:username => 'foo@bar.com', :password => 'pass')
-        called.should be_true
+        expect(called).to be_true
       end
 
-      it "should set expires_at based on expire_in response" do
+      it "sets expires_at based on expire_in response" do
         subject.class.stub(:post).and_return(fake_token_response)
         subject.exchange_token(:username => 'foo@bar.com', :password => 'pass')
-        subject.expires_at.to_i.should == (Time.now + 3600).to_i
+        expect(subject.expires_at.to_i).to eq((Time.now + 3600).to_i)
       end
     end
   end
@@ -255,28 +273,38 @@ describe Soundcloud do
     subject { Soundcloud.new(:access_token => 'ac', :client_id => 'client', :client_secret => 'sect') }
 
     describe "#get" do
-      it "should fail with InvalidAccessTokenException when access token is invalid" do
+      it "raises InvalidAccessTokenException when access token is invalid" do
         stub_request(:get, "https://api.soundcloud.com/me?format=json&oauth_token=ac").
           to_return(:status => 401)
-        lambda do
+        expect do
           subject.send(:get, '/me')
-        end.should raise_error(Soundcloud::ResponseError)
+        end.to raise_error(Soundcloud::ResponseError)
       end
     end
   end
 
   context 'initialized with access_token, refresh_token' do
     subject { Soundcloud.new(:access_token => 'ac', :refresh_token => 'ce', :client_id => 'client', :client_secret => 'sect') }
-    its(:access_token)    { should == 'ac' }
-    its(:use_ssl?)        { should be_true }
+
+    describe "#access_token" do
+      it "returns the initialized value" do
+        expect(subject.access_token).to eq("ac")
+      end
+    end
+
+    describe "#use_ssl?" do
+      it "to be true" do
+        expect(subject.use_ssl?).to be_true
+      end
+    end
 
     [:get, :head, :delete].each do |method|
       describe "##{method}" do
-        it "should pass the oauth_token parameter when doing a request" do
-          Soundcloud.should_receive(method).with('https://api.soundcloud.com/tracks', {:query => {:format => "json", :oauth_token => 'ac'}})
+        it "passes the oauth_token parameter when doing a request" do
+          expect(Soundcloud).to receive(method).with('https://api.soundcloud.com/tracks', {:query => {:format => "json", :oauth_token => 'ac'}})
           subject.send(method, '/tracks')
         end
-        it "should try to refresh the token if it is expired and retry" do
+        it "tries to refresh the token if it is expired and retry" do
           stub_request(method, "https://api.soundcloud.com/tracks/1").
             with(:query => {:format => "json", "oauth_token" => "ac"}).
             to_return(:status => 401, :body => '{"error": "invalid_grant"}', :headers => {:content_type => "application/json"})
@@ -286,10 +314,10 @@ describe Soundcloud do
           stub_request(method, "https://api.soundcloud.com/tracks/1").
             with(:query => {:format => "json", :oauth_token => "new_access_token"}).
             to_return(:body => '{"title": "test"}', :headers => {:content_type => "application/json"})
-          lambda do
+          expect do
             response = subject.send(method, '/tracks/1')
-            response.title.should == 'test'
-          end.should change { subject.access_token }.to('new_access_token')
+            expect(response.title).to eq('test')
+          end.to change { subject.access_token }.to('new_access_token')
         end
       end
     end

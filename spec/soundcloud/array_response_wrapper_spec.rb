@@ -1,15 +1,21 @@
-require File.expand_path(File.join(File.dirname(__FILE__), '../spec_helper'))
+require 'helper'
 
 describe Soundcloud::ArrayResponseWrapper do
+
+  before do
+    @array_response_wrapper = Soundcloud::ArrayResponseWrapper.new([{:foo => 'bar'}])
+  end
+
   describe '.new' do
-    it "should provide a Mash with accessors for the key/values of each item of the passed response" do
-      Soundcloud::ArrayResponseWrapper.new([{:foo => 'bar'}]).first.foo.should == 'bar'
+    it "provides a Mash with accessors for the key/values of each item of the passed response" do
+      expect(@array_response_wrapper.first.foo).to eq('bar')
     end
   end
 
   describe '#response' do
-    it "should return the original response object" do
-      Soundcloud::ArrayResponseWrapper.new([{:foo => 'bar'}]).response.should == [{:foo => 'bar'}]
+    it "returns the original response object" do
+      expect(@array_response_wrapper.response).to be_an Array
+      expect(@array_response_wrapper.response).to eq([{:foo => 'bar'}])
     end
   end
 
