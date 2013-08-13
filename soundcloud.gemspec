@@ -16,7 +16,6 @@ Gem::Specification.new do |spec|
 
   spec.required_rubygems_version = '>= 1.3.5'
 
-  spec.add_dependency('httparty',      '~> 0.11.0')
   spec.add_dependency('httmultiparty', '~> 0.3.0')
   spec.add_dependency('hashie', '~> 2.0')
 

@@ -6,7 +6,6 @@ It provides simple methods to handle authorization and to execute HTTP calls.
 ## Requirements
 * hashie
 * httmultiparty
-* httparty
 
 ## Installation
     gem install soundcloud
