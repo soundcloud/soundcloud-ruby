@@ -64,7 +64,7 @@ client = SoundCloud.new({
   :refresh_token => SOME_REFRESH_TOKEN
 })
 
-# upload a new track with track.mp3 as audio and image.jpg as artwork
+# upload a new track with audio.mp3 as audio and image.jpg as artwork
 track = client.post('/tracks', :track => {
   :title      => 'a new track',
   :asset_data => File.new('audio.mp3')
