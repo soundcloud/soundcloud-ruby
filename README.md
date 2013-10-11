@@ -168,3 +168,7 @@ Will return true or false depending on if `expires_at` is in the past.
 In case a request was not successful a SoundCloud::ResponseError will be
 raised. The original HTTParty response is available through
 `SoundCloud::ResponseError#response`.
+
+## Documentation
+
+For more code examples, please visit the [SoundCloud API Documentation](http://developers.soundcloud.com/docs).
