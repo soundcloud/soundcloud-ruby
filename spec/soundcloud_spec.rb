@@ -24,7 +24,7 @@ describe SoundCloud do
 
     describe "#use_ssl?" do
       it "is false" do
-        expect(subject.use_ssl?).to be_false
+        expect(subject.use_ssl?).to be false
       end
     end
 
@@ -200,19 +200,19 @@ describe SoundCloud do
     context "when initialized with client_id, client_secret" do
       let(:fake_token_response){{'access_token' => 'ac', 'expires_in' => 3600, 'scope' => "*", 'refresh_token' => 'ref'}}
       before do
-        fake_token_response.stub(:success?).and_return(true)
+        allow(fake_token_response).to receive(:success?).and_return(true)
       end
 
       subject{SoundCloud.new(:client_id => 'client', :client_secret => 'secret')}
 
       it "stores the passed options" do
-        subject.class.stub(:post).and_return(fake_token_response)
+        allow(subject.class).to receive(:post).and_return(fake_token_response)
         subject.exchange_token(:refresh_token => 'refresh')
         expect(subject.refresh_token).to eq('ref')
       end
 
       it "calls authorize endpoint to exchange token and store them when refresh token is passed" do
-        subject.class.stub(:post)
+        allow(subject.class).to receive(:post)
         expect(SoundCloud::Client).to receive(:post).with('https://api.soundcloud.com/oauth2/token', :query => {
           :grant_type    => 'refresh_token',
           :refresh_token => 'refresh',
@@ -251,15 +251,15 @@ describe SoundCloud do
       end
 
       it "calls the on_exchange_token callback if it refreshes a token" do
-        subject.class.stub(:post).and_return(fake_token_response)
+        allow(subject.class).to receive(:post).and_return(fake_token_response)
         called = false
         subject.on_exchange_token{|soundcloud| expect(soundcloud).to eq(subject); called = true}
         subject.exchange_token(:username => 'foo@bar.com', :password => 'pass')
-        expect(called).to be_true
+        expect(called).to be true
       end
 
       it "sets expires_at based on expire_in response" do
-        subject.class.stub(:post).and_return(fake_token_response)
+        allow(subject.class).to receive(:post).and_return(fake_token_response)
         subject.exchange_token(:username => 'foo@bar.com', :password => 'pass')
         expect(subject.expires_at.to_i).to eq((Time.now + 3600).to_i)
       end
@@ -291,7 +291,7 @@ describe SoundCloud do
 
     describe "#use_ssl?" do
       it "to be true" do
-        expect(subject.use_ssl?).to be_true
+        expect(subject.use_ssl?).to be true
       end
     end
 
