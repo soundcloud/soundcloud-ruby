@@ -7,8 +7,8 @@ Gem::Specification.new do |spec|
   spec.name        = 'soundcloud'
   spec.version     = SoundCloud::VERSION
   spec.platform    = Gem::Platform::RUBY
-  spec.authors     = ["Johannes Wagener"]
-  spec.email       = ["johannes@soundcloud.com"]
+  spec.authors     = ["Johannes Wagener", "Erik Michaels-Ober"]
+  spec.email       = ["api@soundcloud.com"]
   spec.homepage    = 'http://dev.soundcloud.com'
   spec.summary     = "The official SoundCloud API wrapper."
   spec.description = "The official SoundCloud API wrapper. It provides simple methods to handle authorization and to execute HTTP calls."
@@ -20,6 +20,6 @@ Gem::Specification.new do |spec|
 
   spec.add_development_dependency('bundler', '~> 1.0')
 
-  spec.files        = Dir.glob("lib/**/*") + %w(README.md)
+  spec.files        = Dir.glob("lib/**/*") + %w(LICENSE.md README.md)
   spec.require_path = 'lib'
 end
