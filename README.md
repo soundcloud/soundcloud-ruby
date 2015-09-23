@@ -12,6 +12,14 @@ gem install soundcloud
 ```
 
 ## Examples
+
+The following examples are for the [latest gem version](https://rubygems.org/gems/soundcloud).
+
+```ruby
+SoundCloud::VERSION
+# => "0.3.2"
+```
+
 #### Print links of the 10 hottest tracks
 ```ruby
 # register a client with YOUR_CLIENT_ID as client_id_
