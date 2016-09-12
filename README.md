@@ -17,7 +17,7 @@ The following examples are for the [latest gem version](https://rubygems.org/gem
 
 ```ruby
 SoundCloud::VERSION
-# => "0.3.2"
+# => "0.3.3"
 ```
 
 #### Print links of the 10 most recent tracks
