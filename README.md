@@ -20,12 +20,12 @@ SoundCloud::VERSION
 # => "0.3.2"
 ```
 
-#### Print links of the 10 hottest tracks
+#### Print links of the 10 most recent tracks
 ```ruby
 # register a client with YOUR_CLIENT_ID as client_id_
 client = SoundCloud.new(:client_id => YOUR_CLIENT_ID)
-# get 10 hottest tracks
-tracks = client.get('/tracks', :limit => 10, :order => 'hotness')
+# get newest tracks
+tracks = client.get('/tracks', :limit => 10)
 # print each link
 tracks.each do |track|
   puts track.permalink_url
