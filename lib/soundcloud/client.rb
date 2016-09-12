@@ -1,7 +1,9 @@
+require 'soundcloud/version'
+
 module SoundCloud
   class Client
     include HTTMultiParty
-    USER_AGENT            = "SoundCloud Ruby Wrapper #{VERSION}"
+    USER_AGENT            = "SoundCloud Ruby Wrapper #{SoundCloud::VERSION}"
     CLIENT_ID_PARAM_NAME  = :client_id
     API_SUBHOST           = 'api'
     AUTHORIZE_PATH        = '/connect'
@@ -151,9 +153,9 @@ module SoundCloud
         else
           raise ResponseError.new(response)
         end
-      elsif response.is_a?(Hash)
+      elsif response_is_a?(response, Hash)
         HashResponseWrapper.new(response)
-      elsif response.is_a?(Array)
+      elsif response_is_a?(response, Array)
         ArrayResponseWrapper.new(response)
       elsif response && response.success?
         response
@@ -193,6 +195,10 @@ module SoundCloud
         "#{scheme}://#{api_host}#{path}#{uri.query ? "?#{uri.query}" : ""}",
         options
       ]
+    end
+
+    def response_is_a?(response, type)
+      response.is_a?(type) || (response.respond_to?(:parsed_response) && response.parsed_response.is_a?(type))
     end
 
   end
