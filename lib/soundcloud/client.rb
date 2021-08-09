@@ -18,7 +18,7 @@ module SoundCloud
 
     def initialize(options={})
       store_options(options)
-      if access_token.nil? && (options_for_refresh_flow_present? || options_for_credentials_flow_present? || options_for_code_flow_present?)
+      if access_token.nil? && (options_for_refresh_flow_present? || options_for_credentials_flow_present? || options_for_code_flow_present? || client_secret)
         exchange_token
       end
       raise ArgumentError, "At least a client_id or an access_token must be present" if client_id.nil? && access_token.nil?
@@ -127,7 +127,7 @@ module SoundCloud
           :redirect_uri => @options[:redirect_uri],
           :code => @options[:code],
         }
-      else
+      elsif client_secret
         { :grant_type => 'client_credentials' }
       end
 

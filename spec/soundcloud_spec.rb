@@ -188,10 +188,15 @@ describe SoundCloud do
     end
 
     it "raises a response error when exchanging token results in 401" do
+      stub_request(:post, "https://api.soundcloud.com/oauth2/token").
+        with(:body => {:grant_type => "client_credentials", :client_id => "x", :client_secret => "bang"}).
+        to_return(:status => 200, :body => '{"access_token":"ac","refresh_token":"as"}', :headers => {:content_type => "application/json"})
+
+      stub_request(:post, "https://api.soundcloud.com/oauth2/token").
+        with(:body => {:grant_type => "refresh_token", :refresh_token => "as", :client_id => "x", :client_secret => "bang"}).
+        to_return(:status => 401, :body => '{error: "invalid_client"}', :headers => {:content_type => "application/json"})
+
       expect do
-        stub_request(:post, "https://api.soundcloud.com/oauth2/token").
-          with(:body => {:grant_type => "refresh_token", :refresh_token => "as", :client_id => "x", :client_secret => "bang"}).
-          to_return(:status => 401, :body => '{error: "invalid_client"}', :headers => {:content_type => "application/json"})
         SoundCloud.new(:client_id => 'x', :client_secret => 'bang').exchange_token(:refresh_token => 'as')
       end.to raise_error(SoundCloud::ResponseError)
     end
@@ -201,9 +206,12 @@ describe SoundCloud do
       let(:fake_token_response){{'access_token' => 'ac', 'expires_in' => 3600, 'scope' => "*", 'refresh_token' => 'ref'}}
       before do
         allow(fake_token_response).to receive(:success?).and_return(true)
+        stub_request(:post, "https://api.soundcloud.com/oauth2/token").
+          with(:body => {:grant_type => "client_credentials", :client_id => "client", :client_secret => "secret"}).
+          to_return(:status => 200, :body => '{"access_token":"ac","refresh_token":null}', :headers => {:content_type => "application/json"})
       end
 
-      subject{SoundCloud.new(:client_id => 'client', :client_secret => 'secret')}
+      subject { SoundCloud.new(:client_id => 'client', :client_secret => 'secret') }
 
       it "stores the passed options" do
         allow(subject.class).to receive(:post).and_return(fake_token_response)
@@ -225,6 +233,7 @@ describe SoundCloud do
       end
 
       it "calls authorize endpoint to exchange token and store them when credentials are passed" do
+        subject
         expect(SoundCloud::Client).to receive(:post).with('https://api.soundcloud.com/oauth2/token', :query => {
           :grant_type    => 'password',
           :username      => 'foo@bar.com',
