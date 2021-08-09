@@ -108,13 +108,14 @@ module SoundCloud
     def exchange_token(options={})
       store_options(options)
       raise ArgumentError, 'client_id and client_secret is required to retrieve an access_token' if client_id.nil? || client_secret.nil?
-      client_params = {:client_id => client_id, :client_secret => client_secret}
+
       params = if options_for_refresh_flow_present?
         {
           :grant_type => 'refresh_token',
           :refresh_token => refresh_token,
         }
       elsif options_for_credentials_flow_present?
+        puts "Warning: Password grant is deprecated, see https://developers.soundcloud.com/blog/security-updates-api"
         {
           :grant_type => 'password',
           :username => @options[:username],
@@ -126,11 +127,16 @@ module SoundCloud
           :redirect_uri => @options[:redirect_uri],
           :code => @options[:code],
         }
+      else
+        { :grant_type => 'client_credentials' }
       end
-      params.merge!(client_params)
+
+      params.merge!(:client_id => client_id, :client_secret => client_secret)
+
       response = handle_response(false) {
         self.class.post("https://#{api_host}#{TOKEN_PATH}", :query => params)
       }
+
       @options.merge!(:access_token => response.access_token, :refresh_token => response.refresh_token)
       @options[:expires_at] = Time.now + response.expires_in if response.expires_in
       @options[:on_exchange_token].call(*[(self if @options[:on_exchange_token].arity == 1)].compact)
@@ -187,8 +193,9 @@ module SoundCloud
       options[body_or_query] ||= {}
       options[body_or_query][:format] = "json"
       if access_token
-        options[body_or_query][:oauth_token] = access_token
+        options[:headers] = { 'Authorization' => "OAuth #{access_token}" }
       else
+        puts "Warning: Authorization via ClientId is deprecated, see https://developers.soundcloud.com/blog/security-updates-api"
         options[body_or_query][CLIENT_ID_PARAM_NAME] = client_id
       end
       [
@@ -200,6 +207,5 @@ module SoundCloud
     def response_is_a?(response, type)
       response.is_a?(type) || (response.respond_to?(:parsed_response) && response.parsed_response.is_a?(type))
     end
-
   end
 end
