@@ -18,10 +18,10 @@ module SoundCloud
 
     def initialize(options={})
       store_options(options)
-      if access_token.nil? && (options_for_refresh_flow_present? || options_for_credentials_flow_present? || options_for_code_flow_present? || client_secret)
+      if access_token.nil? && (options_for_refresh_flow_present? || options_for_code_flow_present? || options_for_credentials_flow_present?)
         exchange_token
       end
-      raise ArgumentError, "At least a client_id or an access_token must be present" if client_id.nil? && access_token.nil?
+      raise ArgumentError, "At least a client_id, client_secret or an access_token must be present" if client_id.nil? && client_secret.nil? && access_token.nil?
     end
 
     def get(path, query={}, options={})
@@ -102,33 +102,28 @@ module SoundCloud
         "#{param_name}=#{CGI.escape value}" unless value.nil?
       end.compact.join("&")
       store_options(options)
-      "https://#{host}#{AUTHORIZE_PATH}?response_type=code_and_token&client_id=#{client_id}&redirect_uri=#{URI.escape(redirect_uri)}&#{additional_params}"
+      "https://#{api_host}#{AUTHORIZE_PATH}?response_type=code&client_id=#{client_id}&redirect_uri=#{URI.escape(redirect_uri)}&#{additional_params}"
     end
 
     def exchange_token(options={})
       store_options(options)
       raise ArgumentError, 'client_id and client_secret is required to retrieve an access_token' if client_id.nil? || client_secret.nil?
 
-      params = if options_for_refresh_flow_present?
+      params = if options_for_code_flow_present?
+        {
+          :grant_type => 'authorization_code',
+          :redirect_uri => redirect_uri,
+          :code => @options[:code],
+        }
+      elsif options_for_refresh_flow_present?
         {
           :grant_type => 'refresh_token',
           :refresh_token => refresh_token,
         }
       elsif options_for_credentials_flow_present?
-        puts "Warning: Password grant is deprecated, see https://developers.soundcloud.com/blog/security-updates-api"
         {
-          :grant_type => 'password',
-          :username => @options[:username],
-          :password => @options[:password],
+          :grant_type => 'client_credentials'
         }
-      elsif options_for_code_flow_present?
-        {
-          :grant_type => 'authorization_code',
-          :redirect_uri => @options[:redirect_uri],
-          :code => @options[:code],
-        }
-      elsif client_secret
-        { :grant_type => 'client_credentials' }
       end
 
       params.merge!(:client_id => client_id, :client_secret => client_secret)
@@ -139,6 +134,7 @@ module SoundCloud
 
       @options.merge!(:access_token => response.access_token, :refresh_token => response.refresh_token)
       @options[:expires_at] = Time.now + response.expires_in if response.expires_in
+      @options[:code] = nil
       @options[:on_exchange_token].call(*[(self if @options[:on_exchange_token].arity == 1)].compact)
       response
     end
@@ -173,7 +169,7 @@ module SoundCloud
     end
 
     def options_for_credentials_flow_present?
-      !!(@options[:username] && @options[:password])
+      !!@options[:client_secret]
     end
 
     def options_for_code_flow_present?
@@ -195,7 +191,7 @@ module SoundCloud
       if access_token
         options[:headers] = { 'Authorization' => "OAuth #{access_token}" }
       else
-        puts "Warning: Authorization via ClientId is deprecated, see https://developers.soundcloud.com/blog/security-updates-api"
+        puts "Warning: Authorization via client_id is deprecated, access_token is required. For details see https://developers.soundcloud.com/blog/security-updates-api"
         options[body_or_query][CLIENT_ID_PARAM_NAME] = client_id
       end
       [

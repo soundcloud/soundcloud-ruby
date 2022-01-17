@@ -1,7 +1,7 @@
 # ⚠️⚠️DEPRECATED - NO LONGER MAINTAINED⚠️⚠️
-This repository is no longer maintained by the SoundCloud team due to capacity constraints. We're instead focusing our efforts on improving the API & the developer platform. Please note, at the time of updating this, the repo is already not in sync with the latest API changes. 
+This repository is no longer maintained by the SoundCloud team due to capacity constraints. We're instead focusing our efforts on improving the API & the developer platform. Please note the repo might be not in sync with the latest API changes. 
 
-We recommend the community to fork this repo in order to maintain the SDK. We'd be more than happy to make a reference on our developer that the developers can use different SDKs build by the community. In case you need to reach out to us, please head over to https://github.com/soundcloud/api/issues  
+We recommend the community to fork this repo in order to maintain the SDK. We'd be more than happy to make a reference on our developer portal that the developers can use different SDKs build by the community. In case you need to reach out to us, please head over to https://github.com/soundcloud/api/issues  
 
 ---
 
@@ -24,39 +24,21 @@ The following examples are for the [latest gem version](https://rubygems.org/gem
 
 ```ruby
 SoundCloud::VERSION
-# => "0.3.4"
+# => "0.3.6"
 ```
 
-#### Print links of the 10 most recent tracks
+#### OAuth2 client credentials flow
 ```ruby
-# register a client with YOUR_CLIENT_ID as client_id_
-client = SoundCloud.new(:client_id => YOUR_CLIENT_ID)
-# get newest tracks
-tracks = client.get('/tracks', :limit => 10)
-# print each link
-tracks.each do |track|
-  puts track.permalink_url
-end
-```
-
-#### OAuth2 user credentials flow and print the username of the authenticated user
-```ruby
-# register a new client, which will exchange the username, password for an access_token
-# NOTE: the SoundCloud API Docs advise not to use the user credentials flow in a web app.
-# In any case, never store the password of a user.
+# register a new client, which will exchange the client_id, client_secret for an access_token
 client = SoundCloud.new({
   :client_id     => YOUR_CLIENT_ID,
   :client_secret => YOUR_CLIENT_SECRET,
-  :username      => 'some@email.com',
-  :password      => 'userpass'
 })
-
-# print logged in username
-puts client.get('/me').username
 ```
 
 #### OAuth2 authorization code flow
 ```ruby
+# register a new client, providing the client_id, client_secret and redirect_uri
 client = SoundCloud.new({
   :client_id     => YOUR_CLIENT_ID,
   :client_secret => YOUR_CLIENT_SECRET,
@@ -65,14 +47,17 @@ client = SoundCloud.new({
 
 redirect client.authorize_url()
 # the user should be redirected to "https://soundcloud.com/connect?client_id=YOUR_CLIENT_ID&response_type=code&redirect_uri=YOUR_REDIRECT_URI"
-# after granting access he will be redirected back to YOUR_REDIRECT_URI
+# after granting access they will be redirected back to YOUR_REDIRECT_URI with an authorization code present
+# ex: <YOUR_REDIRECT_URI>?code=XXX
 # in your respective handler you can build an exchange token from the transmitted code
 client.exchange_token(:code => params[:code])
 ```
 
 #### OAuth2 refresh token flow, upload a track and print its link
 ```ruby
-# register a new client which will exchange an existing refresh_token for an access_token
+# register a new client and exchange an existing refresh_token for an access_token
+# note: refresh_token can also be acquired from authorization code/client_credentials flows.
+# use this flow to automatically update the token when it expires.
 client = SoundCloud.new({
   :client_id     => YOUR_CLIENT_ID,
   :client_secret => YOUR_CLIENT_SECRET,
@@ -89,11 +74,19 @@ track = client.post('/tracks', :track => {
 puts track.permalink_url
 ```
 
+
+#### Print links of the 10 most recent tracks
+```ruby
+# get newest tracks
+tracks = client.get('/tracks', :limit => 10)
+# print each link
+tracks.each do |track|
+  puts track.permalink_url
+end
+```
+
 #### Resolve a track url and print its id
 ```ruby
-# register the client
-client = SoundCloud.new(:client_id => YOUR_CLIENT_ID)
-
 # call the resolve endpoint with a track url
 track = client.get('/resolve', :url => "http://soundcloud.com/forss/flickermood")
 
@@ -104,7 +97,7 @@ puts track.id
 ### Initializing a client with an access token and updating the users profile description
 ```ruby
 # initializing a client with an access token
-client = SoundCloud.new(:access_token => SOME_ACCESS_TOKEN)
+client = SoundCloud.new(:access_token => A_VALID_TOKEN)
 
 # updating the users profile description
 client.put("/me", :user => {:description => "a new description"})
@@ -112,8 +105,6 @@ client.put("/me", :user => {:description => "a new description"})
 
 ### Add a track to a playlist / set
 ```ruby
-client = SoundCloud.new(:access_token => "A_VALID_TOKEN")
-
 # get my last playlist
 playlist = client.get("/me/playlists").first
 
@@ -137,20 +128,21 @@ p playlist.tracks.map(&:id)
 
 ## Interface
 #### SoundCloud.new(options={})
-Stores the passed options and call exchange_token in case options are passed
+Stores the passed options and calls exchange_token in case all options are passed
 that allow an exchange of tokens.
 
 #### SoundCloud#exchange_token(options={})
-Stores the passed options and try to exchange tokens if no access_token is
+Stores the passed options and tries to exchange tokens if no access_token is
 present and:
 
-* `refresh_token`, `client_id` and `client_secret` is present.
-* `client_id`, `client_secret`, `username`, and `password` is present
-* `client_id`, `client_secret`, `redirect_uri`, and `code` is present
+* `client_id`, `client_secret` is present (client credentials flow).
+* `refresh_token`, `client_id` and `client_secret` is present (refresh token flow).
+* `client_id`, `client_secret`, `redirect_uri`, and `code` is present (authorization code flow).
 
 #### SoundCloud#authorize_url(options={})
-Stores the passed options except for `state` and `display` and return an
-authorize url. The `client_id` and `redirect_uri` options need to present to
+Stores the passed options except for `state` and `display` and returns an
+authorize url (a part of authorization code flow).
+The `client_id` and `redirect_uri` options has to be present to
 generate the authorize url. The `state` and `display` options can be used to
 set the parameters accordingly in the authorize url.
 
