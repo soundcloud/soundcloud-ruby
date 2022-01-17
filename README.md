@@ -40,8 +40,8 @@ client = SoundCloud.new({
 ```ruby
 # register a new client, providing the client_id, client_secret and redirect_uri
 client = SoundCloud.new({
- :client_id     => "n9Ri90dEoSsN9uG8F6zdiOwlIQAKW2LT",
-  :client_secret => "I0S1OfRtLrdR8CUhvRplsiIoDCqWeoDK",
+ :client_id     => YOUR_CLIENT_ID,
+  :client_secret => YOUR_CLIENT_SECRET,
   :redirect_uri  => "soundcloud.com",
 })
 
