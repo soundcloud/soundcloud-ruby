@@ -24,7 +24,7 @@ The following examples are for the [latest gem version](https://rubygems.org/gem
 
 ```ruby
 SoundCloud::VERSION
-# => "0.3.6"
+# => "0.3.7"
 ```
 
 #### OAuth2 client credentials flow
