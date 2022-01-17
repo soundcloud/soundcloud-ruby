@@ -102,7 +102,7 @@ module SoundCloud
         "#{param_name}=#{CGI.escape value}" unless value.nil?
       end.compact.join("&")
       store_options(options)
-      "https://#{api_host}#{AUTHORIZE_PATH}?response_type=code&client_id=#{client_id}&redirect_uri=#{redirect_uri}&#{additional_params}"
+      "https://#{api_host}#{AUTHORIZE_PATH}?response_type=code&client_id=#{client_id}&redirect_uri=#{URI.escape(redirect_uri)}&#{additional_params}"
     end
 
     def exchange_token(options={})

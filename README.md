@@ -42,7 +42,7 @@ client = SoundCloud.new({
 client = SoundCloud.new({
  :client_id     => YOUR_CLIENT_ID,
   :client_secret => YOUR_CLIENT_SECRET,
-  :redirect_uri  => "soundcloud.com",
+  :redirect_uri  => YOUR_REDIRECT_URI,
 })
 
 redirect client.authorize_url()
