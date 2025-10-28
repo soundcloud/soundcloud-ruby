@@ -191,7 +191,7 @@ module SoundCloud
       if access_token
         options[:headers] = { 'Authorization' => "OAuth #{access_token}" }
       else
-        puts "Warning: Authorization via client_id is deprecated, access_token is required. For details see https://developers.soundcloud.com/blog/security-updates-api"
+        puts 
         options[body_or_query][CLIENT_ID_PARAM_NAME] = client_id
       end
       [

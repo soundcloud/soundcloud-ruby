@@ -1,13 +1,11 @@
 # ⚠️⚠️DEPRECATED - NO LONGER MAINTAINED⚠️⚠️
 This repository is no longer maintained by the SoundCloud team due to capacity constraints. We're instead focusing our efforts on improving the API & the developer platform. Please note the repo might be not in sync with the latest API changes. 
 
-We recommend the community to fork this repo in order to maintain the SDK. We'd be more than happy to make a reference on our developer portal that the developers can use different SDKs build by the community. In case you need to reach out to us, please head over to https://github.com/soundcloud/api/issues  
 
 ---
 
 # SoundCloud API Wrapper
 
-[![Build Status](https://travis-ci.org/soundcloud/soundcloud-ruby.png?branch=master)](https://travis-ci.org/soundcloud/soundcloud-ruby)
 
 ## Description
 The official SoundCloud API wrapper. It provides simple methods to handle
@@ -15,12 +13,10 @@ authorization and to execute HTTP calls.
 
 ## Installation
 ```sh
-gem install soundcloud
 ```
 
 ## Examples
 
-The following examples are for the [latest gem version](https://rubygems.org/gems/soundcloud).
 
 ```ruby
 SoundCloud::VERSION
@@ -46,7 +42,6 @@ client = SoundCloud.new({
 })
 
 redirect client.authorize_url()
-# the user should be redirected to "https://soundcloud.com/connect?client_id=YOUR_CLIENT_ID&response_type=code&redirect_uri=YOUR_REDIRECT_URI"
 # after granting access they will be redirected back to YOUR_REDIRECT_URI with an authorization code present
 # ex: <YOUR_REDIRECT_URI>?code=XXX
 # in your respective handler you can build an exchange token from the transmitted code
@@ -88,7 +83,6 @@ end
 #### Resolve a track url and print its id
 ```ruby
 # call the resolve endpoint with a track url
-track = client.get('/resolve', :url => "http://soundcloud.com/forss/flickermood")
 
 # print the track id
 puts track.id
@@ -178,4 +172,3 @@ raised. The original HTTParty response is available through
 
 ## Documentation
 
-For more code examples, please visit the [SoundCloud API Documentation](http://developers.soundcloud.com/docs).
